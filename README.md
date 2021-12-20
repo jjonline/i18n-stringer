@@ -4,9 +4,9 @@ i18n-stringer is a golang international language pack tool, refer to the officia
 
 golang国际化语言包工具，参考了官方stringer工具
 
-> `test`目录给出了四种使用示例，请参考
+> `test`目录给出了多种使用示例，请参考
 
-> The `test` directory gives four usage examples
+> The `test` directory gives some usage examples
 
 # 一、Usage/使用
 
@@ -43,7 +43,7 @@ const (
 * Use TOML files in the language package directory to define key-value pairs for i18n translation
 * 语言包目录下若使用子目录，则子目录名将被作为语言类型标记，子目录下TOML文件名和文件数目不做限制，例如：`en`；
 * If a subdirectory is used in the language package directory, the name of the subdirectory will be marked as the language type, TOML file name and number of files in subdirectories are not limited. For example: `en`;
-* 语言包目录下不使用子目录直接定义TOML文件的，则TOML文件的文件名将被作为语言类型标记，例如：`en.toml；
+* 语言包目录下不使用子目录直接定义TOML文件的，则TOML文件的文件名将被作为语言类型标记，例如：`en.toml`；
 * If the TOML file is directly defined in language package directory, the file name of the TOML file will be marked as the language type. For example: `en.toml`;
 * 语言包键值对的键名使用常量字面量，上述例子中`ERROROFYOU`就将作为键名；
 * Use constant literals for the key names of language pack key-value pairs. In the above example, `ERROROFYOU` will be used as the key name
@@ -51,12 +51,14 @@ const (
 ## 1.4、代码生成/Generate Code
 
 Go to the directory that defines the constant under the terminal and execute it
+
 终端下进入到定义常量的目录直接执行：
 ````
 $GOPATH/bin/i18n-stringer -type Code -tomlpath i18n
 ````
 
 You can also use the `go generate` command directly in the constant source code
+
 你也可以配合`go generate`指令直接在定于常量的源码里使用
 ````
 // write this code in your golang source code, then use `go generate` command
@@ -64,6 +66,7 @@ You can also use the `go generate` command directly in the constant source code
 ````
 
 Get more help information about commands
+
 获取更多命令使用帮助信息：
 ````
 $GOPATH/bin/i18n-stringer --help
@@ -71,6 +74,8 @@ $GOPATH/bin/i18n-stringer --help
 Flags
 ````
 Flags:
+  -check
+        Check for missing constant literals in YAML files by language
   -ctxkey string
         key used by context.Value for get locale; default i18nLocale
   -defaultlocale string
@@ -86,7 +91,9 @@ Flags:
 
 ````
 
-> If your GOBIN directory has been added to the environment variable, the above `$GOPATH/bin/` can also be omitted/如果你的GOBIN目录已加入环境变量，上述`$GOPATH/bin/`也是可以省略的
+> If your GOBIN directory has been added to the environment variable, the above `$GOPATH/bin/` can also be omitted
+
+> 如果你的GOBIN目录已加入环境变量，上述`$GOPATH/bin/`也是可以省略的
 
 # 二、TOML规范支持/TOML Specification Support
 
@@ -99,4 +106,4 @@ TOML Link : [https://toml.io/en/](https://toml.io/en/)
 * 区块也就是TOML官方的`Table`将被忽略
 * The block section, which is the TOML official `Table`, will be ignored
 * 支持`#`开头的注释，注释将被忽略
-* Supports comments starting with `#`, comments will be ignored
+* Support comments starting with `#`, comments will be ignored
