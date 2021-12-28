@@ -782,13 +782,15 @@ func _%[1]s_localeFromCtxWithFallback(ctx context.Context) string {
 // 1% typeName
 const langFunc = `// Lang get target translate text use context.Context
 //  - ctx context with Value use Key from  _%[1]s_ctxKey
-func (i Code) Lang(ctx context.Context) string {
+//  - args Optional placeholder replacement value
+func (i _%[1]s) Lang(ctx context.Context, args ...interface{}) string {
     return i._trans(key, _%[1]s_localeFromCtxWithFallback(ctx))
 }
 
 // Trans get target translate text use specified language locale identifier
 //  - locale specified language locale identifier, need pass by _%[1]s_isLocaleSupport
-func (i Code) Trans(locale string) string {
+//  - args Optional placeholder replacement value
+func (i _%[1]s) Trans(locale string, args ...interface{}) string {
     if !_%[1]s_isLocaleSupport(locale) {
         locale = _defaultLocale
     }
@@ -796,7 +798,7 @@ func (i Code) Trans(locale string) string {
 }
 
 // _trans trustworthy parameters inside method
-func (i Code) _trans(locale string) string {
+func (i _%[1]s) _trans(locale string, args ...interface{}) string {
     return ""
 }`
 
@@ -967,12 +969,12 @@ func (p *Parser) readOneToml(path, locale string) {
 
 		// set to map
 		if _, exist := p.localesMap[locale]; !exist {
-			p.localesMap[locale] = make(map[string]string, 1)
+			p.localesMap[locale] = make(map[string]string, 0)
 		}
 
 		// check key exist then notice
 		if _, exist := p.localesMap[locale][key]; exist {
-			log.Printf("Duplicate key-value pairs for key %s at file `%s`", key, path)
+			log.Printf("Duplicate key-value pairs for key `%s` at file `%s` with locale `%s`", key, path, locale)
 		}
 		p.localesMap[locale][key] = value
 	}
@@ -981,7 +983,7 @@ func (p *Parser) readOneToml(path, locale string) {
 // parseString trans value
 func (p *Parser) parseString(s string) (string, int, bool) {
 	if len(s) <= 0 {
-		return "", 0, false
+		return "", 0, true // allow empty value
 	}
 
 	index := 0

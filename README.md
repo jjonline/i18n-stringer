@@ -8,6 +8,14 @@ golang国际化语言包工具，参考了官方stringer工具
 
 > The `test` directory gives some usage examples
 
+在項目根目錄下使用`make`命令調試`test`目錄裡的測試用例
+
+use command `make` for examples in the `test` directory
+
+````
+make debug
+````
+
 # 一、Usage/使用
 
 ## 1.1、Build/下载编译
@@ -65,6 +73,36 @@ You can also use the `go generate` command directly in the constant source code
 //go:generate $GOPATH/bin/i18n-stringer -type Code -tomlpath i18n
 ````
 
+## 1.5、開發調試/Dev and debugging
+
+可以使用`-check`指令參數核對語言包缺失的鍵值對
+
+You can use the `-check` command
+to check the missing key-value pairs of the language pack
+
+````
+$GOPATH/bin/i18n-stringer -type Code -tomlpath i18n -check
+````
+
+带`-check`的命令執行後如果有缺失鍵值對，則可能會输出如下提示以協助開發
+
+After the command with `-check` is executed,
+if there are missing key-value pairs,
+the following prompt may be output to assist development
+
+````
+i18n-stringer: Check Fail
+i18n-stringer: The missing key-value pair information as follows
+************TYPE for `Code` of locale `zh-hk`************
+CodeOK
+CodeErr
+CodeFail
+CodeRange1
+CodeRange2
+````
+
+## 1.6、指令詳情/command details
+
 Get more help information about commands
 
 获取更多命令使用帮助信息：
@@ -94,6 +132,30 @@ Flags:
 > If your GOBIN directory has been added to the environment variable, the above `$GOPATH/bin/` can also be omitted
 
 > 如果你的GOBIN目录已加入环境变量，上述`$GOPATH/bin/`也是可以省略的
+
+## 1.7、調用/Code call
+
+整形自定義類型除了添加`func (i typ) String() string`方法以實現`fmt.Stringer`接口外，
+还会會被添加`func (i typ) Trans(locale string, args ...interface{}) string`和`func (i typ) Lang(ctx context.Context, args ...interface{}) string`方法。
+使用`Trans`方法指定字符串形式的語言類型例如`en`即可獲取翻譯文本；
+也可以使用`context.Context`攜帶語言類型值的上下文作為參數的方法`Lang`獲取翻譯文本，
+需要說明的是`context.Context`携带语言类型的键名由`-ctxkey`指定，默認鍵名為`i18nLocale`。
+
+In addition to adding the `func (i typ) String() string` method to implement the `fmt.Stringer` interface,
+the shaping custom type will also be
+added with `func (i typ) Trans(locale string, args ...interface{}) string` and `func ( i typ) Lang(ctx context.Context, args ...interface{}) string` method. 
+Use the `Trans` method to specify the language type in the form of a string, 
+such as `en` to get the translated text; 
+you can also use the `context.Context` method that carries the
+context of the language type value as a parameter to get the translated text.
+The key name of `context.Context` carrying language type is specified by `-ctxkey`, 
+and the default key name is `i18nLocale`.
+
+因部分翻譯文本中可能會使用諸如`%s`類型的替換佔位符在代碼中實時更改，建議規劃好整形數值區間，
+某些區間的值專門用於替換`%s`的。
+
+Because some translation texts may use replacement placeholders such as `%s` to change in the code in real time, 
+it is recommended to plan the integer value range, and this range values are specifically used to replace `%s`.
 
 # 二、TOML规范支持/TOML Specification Support
 
