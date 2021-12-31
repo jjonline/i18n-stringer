@@ -213,7 +213,7 @@ type Generator struct {
 	buf           bytes.Buffer       // Accumulated output.
 	pkg           *Package           // Package we are scanning.
 	parser        *Parser            // toml file Parser
-	values        map[string][]Value // parse source code for TYPE CONST values
+	values        map[string][]Value // parse source code for TYPE CONST values map[typ][]Value
 	tomlPath      string
 	ctxKey        string
 	defaultLocale string
@@ -240,7 +240,7 @@ type Package struct {
 
 // checkConstDefine check missing CONSTANT
 func (g *Generator) checkConstDefine() {
-	// record for not found [locale][]K
+	// The missing key-value pair structure in TOML: map[typ][locale][]K
 	var notPairsRecord = make(map[string]map[string][]string)
 	for tye, values := range g.values {
 		for _, value := range values {
@@ -259,19 +259,61 @@ func (g *Generator) checkConstDefine() {
 		}
 	}
 
+	// The redundant key-value pairs defined in TOML: map[string][]K
+	var noneUsedRecord = make(map[string][]string)
+	for locale, items := range g.parser.localesMap {
+		for key := range items {
+			keyExist := false
+			for _, values := range g.values {
+				if keyExist {
+					break // when key exist, break this key's check
+				}
+				for _, cValue := range values {
+					if cValue.originalName == key {
+						keyExist = true
+						break
+					}
+				}
+			}
+
+			// all typ do not use this key as CONST
+			if !keyExist {
+				if _, existMap := noneUsedRecord[locale]; !existMap {
+					noneUsedRecord[locale] = make([]string, 0)
+				}
+				noneUsedRecord[locale] = append(noneUsedRecord[locale], key)
+			}
+		}
+	}
+
 	if len(notPairsRecord) > 0 {
 		log.Printf("Check Fail")
 		log.Printf("The missing key-value pair information as follows")
 		log.SetPrefix("")
 		for typ, values := range notPairsRecord {
 			for locale, items := range values {
-				log.Printf("************TYPE for `%s` of locale `%s`************", typ, locale)
+				log.Printf("************TYPE `%s` locale `%s` missing key-value pair************", typ, locale)
 				for _, key := range items {
-					log.Printf("%s", key)
+					log.Printf("%s=\"\"", key)
 				}
 			}
 		}
-	} else {
+	}
+
+	if len(noneUsedRecord) > 0 {
+		log.SetPrefix("i18n-stringer: ")
+		log.Printf("Check Warning")
+		log.Printf("key-value pairs that will not be used because there is no corresponding defined constant")
+		log.SetPrefix("")
+		for locale, items := range noneUsedRecord {
+			log.Printf("************Can be deleted TOML keys of locale `%s`************", locale)
+			for _, key := range items {
+				log.Printf("%s", key)
+			}
+		}
+	}
+
+	if len(notPairsRecord) == 0 && len(noneUsedRecord) == 0 {
 		log.Printf("Check success, All constants have key-value pairs set")
 	}
 }
