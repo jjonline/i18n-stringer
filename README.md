@@ -84,21 +84,26 @@ to check the missing key-value pairs of the language pack
 $GOPATH/bin/i18n-stringer -type Code -tomlpath i18n -check
 ````
 
-带`-check`的命令執行後如果有缺失鍵值對，則可能會输出如下提示以協助開發
+带`-check`的命令執行後如果有缺失鍵值對或無用鍵值對，則可能會输出如下提示以協助開發
 
 After the command with `-check` is executed,
-if there are missing key-value pairs,
+if there are missing key-value pairs or useless key-value pairs,
 the following prompt may be output to assist development
 
 ````
 i18n-stringer: Check Fail
 i18n-stringer: The missing key-value pair information as follows
-************TYPE for `Code` of locale `zh-hk`************
-CodeOK
-CodeErr
-CodeFail
-CodeRange1
-CodeRange2
+i18n-stringer: You can copy and fill it to the corresponding TOML file
+************TYPE `Single` locale `zh-hk` missing key-value pair************
+Sig01=""
+Sig02=""
+Sig03=""
+i18n-stringer: Check Warning
+i18n-stringer: key-value pairs that will not be used because there is no corresponding defined constant
+i18n-stringer: You can delete the key-value pairs in the corresponding TOML file
+************Can be deleted TOML keys of locale `en`************
+HELLO
+WORLD
 ````
 
 ## 1.6、指令詳情/command details

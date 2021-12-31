@@ -289,6 +289,7 @@ func (g *Generator) checkConstDefine() {
 	if len(notPairsRecord) > 0 {
 		log.Printf("Check Fail")
 		log.Printf("The missing key-value pair information as follows")
+		log.Printf("You can copy and fill it to the corresponding TOML file")
 		log.SetPrefix("")
 		for typ, values := range notPairsRecord {
 			for locale, items := range values {
@@ -304,6 +305,7 @@ func (g *Generator) checkConstDefine() {
 		log.SetPrefix("i18n-stringer: ")
 		log.Printf("Check Warning")
 		log.Printf("key-value pairs that will not be used because there is no corresponding defined constant")
+		log.Printf("You can delete the key-value pairs in the corresponding TOML file")
 		log.SetPrefix("")
 		for locale, items := range noneUsedRecord {
 			log.Printf("************Can be deleted TOML keys of locale `%s`************", locale)
