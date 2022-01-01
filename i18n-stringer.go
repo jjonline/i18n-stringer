@@ -145,6 +145,18 @@ func main() {
 	// set default locale when command param do not set
 	if g.defaultLocale == "" {
 		g.defaultLocale = g.parser.locales[0] // default naturally sorted first
+	} else {
+		// check if specify locale is in TOML set
+		isIn := false
+		for _, locale := range g.parser.locales {
+			if g.defaultLocale == locale {
+				isIn = true
+				break
+			}
+		}
+		if !isIn {
+			log.Fatal("The locale specified by -defaultlocale is not found in the TOML file definition")
+		}
 	}
 
 	// parse package type && const info
@@ -865,7 +877,7 @@ func (i %[1]s) Wrap(err error, locale string, args ...%[1]s) *I18n%[4]sErrorWrap
 	return &I18n%[4]sErrorWrap{err: err, origin: i, locale: locale, args: args}
 }
 
-// WrapWithContext another error with locale set for i18n TYPE Const
+// WrapWithContext wrap another error with context.Context set for i18n TYPE Const
 //  - err another error
 //  - ctx context with Value use Key from _%[1]s_ctxKey, which pass by i18n-stringer flag -ctxkey
 //  - args optional formatting component
@@ -879,9 +891,9 @@ func (i %[1]s) WrapWithContext(err error, ctx context.Context, args ...%[1]s) *I
 //   Pass easily obtain internationalized translations through Error, Trans, Lang
 //   WARNING
 type I18n%[4]sErrorWrap struct {
-	err    error       // wrap another error
+	err    error   // wrap another error
 	origin %[1]s   // custom shaping type Val
-	locale string      // i18n locale set
+	locale string  // i18n locale set
 	args   []%[1]s // formatted output replacement component
 }
 
