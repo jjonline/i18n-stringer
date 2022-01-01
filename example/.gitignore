@@ -1,0 +1,7 @@
+vendor
+.DS_Store
+*.pri
+*.pub
+*.log
+# Just ignore automatically generated files, use ci/cd to generate before build
+lang/i118n_stringer.go
