@@ -8,10 +8,11 @@ golang國際化語言包工具，參考了官方stringer工具
 
 ## 1.1、Build/下載編譯
 
-构建二进制可执行文件要求go最低版本1.16，生成的代码可使用于1.5及其以上版本
+因未使用`ioutil`包，构建二进制可执行文件要求go最低版本1.16，因生成的代码使用了`context.Context`，生成的代码支持1.7及其以上版本
 
-The minimum version of Go 1.16 is required to build a binary executable file,
-and the generated code can be used for version 1.5 and above
+Because `ioutil` is not used,
+to build a binary executable file the minimum version of Go 1.16 is required,
+because of the use of `context.Context` the generated code can be used for version 1.7 and above
 
 go Version 1.16 and above for install/使用go1.16及其以上版本编译安装
 ````
