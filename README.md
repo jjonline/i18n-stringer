@@ -8,12 +8,12 @@ golang國際化語言包工具，參考了官方stringer工具
 
 ## 1.1、Build/下載編譯
 
-go Version below 1.16/go1.16以下版本
-````
-go get -u -d github.com/tvb-sz/i18n-stringer
-````
+构建二进制可执行文件要求go最低版本1.16，生成的代码可使用于1.5及其以上版本
 
-go Version 1.16 and above/go1.16及其以上版本
+The minimum version of Go 1.16 is required to build a binary executable file,
+and the generated code can be used for version 1.5 and above
+
+go Version 1.16 and above for install/使用go1.16及其以上版本编译安装
 ````
 go install github.com/tvb-sz/i18n-stringer@latest
 ````
@@ -129,7 +129,7 @@ Flags
 ````
 Flags:
   -check
-        Check missing pairs or useless pairs in TOML
+        Check missing or useless key-value pairs in TOML
   -ctxkey string
         key used by context.Value for get locale; default i18nLocale
   -defaultlocale string
