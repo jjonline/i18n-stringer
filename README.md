@@ -125,8 +125,14 @@ Get more help information about commands
 ````
 $GOPATH/bin/i18n-stringer --help
 ````
-Flags
+
 ````
+Usage of i18n-stringer:
+        i18n-stringer [flags] -type T [directory]
+        i18n-stringer [flags] -type T -tomlpath DIR -check # just for check
+        i18n-stringer [flags] -type T -defaultlocale LOCALE -tomlpath DIR files... # Must be a single package
+For more information, see:
+        https://github.com/tvb-sz/i18n-stringer
 Flags:
   -check
         Check missing or useless key-value pairs in TOML
@@ -142,7 +148,6 @@ Flags:
         set toml i18n file path; default srcdir/i18n
   -type string
         comma-separated list of type names; must be set
-
 ````
 
 > If your GOBIN directory has been added to the environment variable, the above `$GOPATH/bin/` can also be omitted

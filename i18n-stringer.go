@@ -90,7 +90,8 @@ var (
 func Usage() {
 	_, _ = fmt.Fprintf(os.Stderr, "Usage of i18n-stringer:\n")
 	_, _ = fmt.Fprintf(os.Stderr, "\ti18n-stringer [flags] -type T [directory]\n")
-	_, _ = fmt.Fprintf(os.Stderr, "\ti18n-stringer [flags] -type T -defaultlocale zh-hk -tomlpath lang files... # Must be a single package\n")
+	_, _ = fmt.Fprintf(os.Stderr, "\ti18n-stringer [flags] -type T -tomlpath DIR -check # just for check\n")
+	_, _ = fmt.Fprintf(os.Stderr, "\ti18n-stringer [flags] -type T -defaultlocale LOCALE -tomlpath DIR files... # Must be a single package\n")
 	_, _ = fmt.Fprintf(os.Stderr, "For more information, see:\n")
 	_, _ = fmt.Fprintf(os.Stderr, "\thttps://github.com/tvb-sz/i18n-stringer\n")
 	_, _ = fmt.Fprintf(os.Stderr, "Flags:\n")
