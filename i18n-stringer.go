@@ -77,7 +77,7 @@ import (
 )
 
 var (
-	check         = flag.Bool("check", false, "Check for missing constant literals in YAML files by language")
+	check         = flag.Bool("check", false, "Check missing pairs or useless pairs in TOML")
 	typeNames     = flag.String("type", "", "comma-separated list of type names; must be set")
 	output        = flag.String("output", "", "output file name; default srcdir/<type>_i18n_string.go")
 	tomlpath      = flag.String("tomlpath", "", "set toml i18n file path; default srcdir/i18n")

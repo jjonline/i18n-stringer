@@ -2,23 +2,11 @@
 
 i18n-stringer is a golang international language pack tool, refer to the official [stinger](https://github.com/golang/tools/tree/master/cmd/stringer) tool
 
-golang国际化语言包工具，参考了官方stringer工具
-
-> `test`目录给出了多种使用示例，请参考
-
-> The `test` directory gives some usage examples
-
-在項目根目錄下使用`make`命令調試`test`目錄裡的測試用例
-
-use command `make` for examples in the `test` directory
-
-````
-make debug
-````
+golang國際化語言包工具，參考了官方stringer工具
 
 # 一、Usage/使用
 
-## 1.1、Build/下载编译
+## 1.1、Build/下載編譯
 
 go Version below 1.16/go1.16以下版本
 ````
@@ -30,7 +18,28 @@ go Version 1.16 and above/go1.16及其以上版本
 go install github.com/tvb-sz/i18n-stringer@latest
 ````
 
-## 1.2、Define INT Constant/定义INT型常量
+---
+
+The `example` directory gives an example of usage witch used `gomod`
+
+`example`目錄給出一種示例，該示例使用了`gomod`，請參考
+````
+cd example
+# Note that the files generated in `example` directory are ignored, 
+# you need to execute the following command to generate
+go generate ./...
+go run main.go
+````
+
+開發調試可以使用`make`指令，可以調試`test`目录下的多个示例
+
+You can use the `make` command for development and debugging,
+can debug multiple examples in the `test` directory
+````
+make debug
+````
+
+## 1.2、Define Numerical shaping Constant/定義整數數值型常量
 
 ````
 type Code int
@@ -41,7 +50,9 @@ const (
 )
 ````
 
-## 1.3、Define Language Package/定义语言包
+> Numerical shaping: such as `int`, `uint`, `uint32`, etc.
+
+## 1.3、Define Language Package/定義語言包
 
 > Use only TOML format files
 
@@ -118,7 +129,7 @@ Flags
 ````
 Flags:
   -check
-        Check for missing constant literals in YAML files by language
+        Check missing pairs or useless pairs in TOML
   -ctxkey string
         key used by context.Value for get locale; default i18nLocale
   -defaultlocale string
