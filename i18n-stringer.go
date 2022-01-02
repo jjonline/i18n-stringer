@@ -1,17 +1,30 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
-
-// i18n-stringer is a tool to automate the creation of methods that satisfy the fmt.Stringer
+//
+// The above is the copyright information reserved by reference stringer
+// REF: https://github.com/golang/tools/tree/master/cmd/stringer
+//
+// Copyright 2021 The team tvb-sz Authors. All rights reserved.
+// Use of this source code is governed by a MIT License
+// license that can be found in the LICENSE file.
+//
+// i18n-stringer is a tool to automate the creation of methods that satisfy the fmt.Stringer, error
 // interface. Given the name of a (signed or unsigned) integer type T that has constants
 // defined, i18n-stringer will create a new self-contained Go source file implementing
 //	func (t T) String() string
+//	func (t T) Error() string
+//	func (t T) Wrap(err error, locale string, args ...T) I18nTErrorWrap
+//	func (t T) WrapWithContext(ctx context.Context, err error, args ...T) I18nTErrorWrap
+//	func (t T) IsLocaleSupport(locale string) bool
+//	func (t T) Lang(ctx context.Context, args ...RuneOne) string
+//	func (t T) Trans(locale string, args ...RuneOne) string
+//	--- Note that I18nTErrorWrap struct is an error wrap type ---
 // The file is created in the same package and directory as the package that defines T.
 // It has helpful defaults designed for use with go generate.
 //
 // Stringer works best with constants that are consecutive values such as created using iota,
-// but creates good code regardless. In the future it might also provide custom support for
-// constant sets that are bit patterns.
+// but creates good code regardless.
 //
 // For example, given this snippet,
 //
@@ -24,32 +37,81 @@
 //		Aspirin
 //		Ibuprofen
 //		Paracetamol
-//		Acetaminophen = Paracetamol
+//		Acetaminophen = Paracetamol // NOTE: with the same value will be ignored, do not use same value
 //	)
+//
+// Create an i18n directory in the same level directory of the source code,
+// create a TOML file use locale name as the file name in the directory,
+// and define the text corresponding to these constants
+//
+// For example,
+//
+//  .
+// 	├── i18n
+//  │     └── en.toml
+//  │     ├── zh_cn.toml
+//  │	  └── zh_hk
+//  │     │     ├── user.toml
+//  │     │     └── merchant.toml
+//  └── pill.go
+//
+// Define TOML key-value pairs in the file srcdir/i18n/en.toml
+//
+// Placebo="en locale Placebo"
+// Aspirin="en locale Aspirin"
+// Ibuprofen="en locale Ibuprofen"
+// Acetaminophen="en locale Acetaminophen"
+//
+// Similarly, other TOML files are also defined
+//
+// The above directory tree defines three locale: en, zh_cn AND zh_hk
+// As you can see, the TOML file name in the i18n directory is used as the locale identifier,
+// the subdirectory name under the directory i18n will be used as the locale identifier,
+// and the TOML file name in the subdirectory is no longer restricted
+// The directory name i18n can be overridden with the -tomlpath flag.
 //
 // running this command
 //
 //	i18n-stringer -type=Pill
 //
-// in the same directory will create the file pill_string.go, in package painkiller,
-// containing a definition of
+// in the same directory will create the file pill_i18n_string.go, in package painkiller,
+// containing a definition of, and a struct I18nPillErrorWrap will also be created
 //
 //	func (Pill) String() string
+//	func (Pill) Error() string
+//	func (Pill) Wrap(err error, locale string, args ...T) I18nPillErrorWrap
+//	func (Pill) WrapWithContext(ctx context.Context, err error, args ...T) I18nPillErrorWrap
+//	func (Pill) IsLocaleSupport(locale string) bool
+//	func (Pill) Lang(ctx context.Context, args ...RuneOne) string
+//	func (Pill) Trans(locale string, args ...RuneOne) string
 //
-// That method will translate the value of a Pill constant to the string representation
-// of the respective constant name, so that the call fmt.Print(painkiller.Aspirin) will
-// print the string "Aspirin".
+// That methods will translate the value of a Pill constant to the string representation
+// of the respective value define in TOML file
 //
 // Typically this process would be run using go generate, like this:
 //
 //	//go:generate i18n-stringer -type=Pill
 //
 // If multiple constants have the same value, the lexically first matching name will
-// be used (in the example, Acetaminophen will print as "Paracetamol").
+// be used (in the example, Acetaminophen will print defined in TOML value of key Paracetamol).
+// NOTE: It is not recommended to use constants of the same value
 //
 // With no arguments, it processes the package in the current directory.
 // Otherwise, the arguments must name a single directory holding a Go package
 // or a set of Go source files that represent a single Go package.
+//
+// The -check flag is used to check missing or useless key-value pairs in TOML files
+// without generating files. Output can be used to help check TOMl files
+//
+// The -tomlpath flag is used to specify the TOML file storage path.
+// If is omitted, the default value is i18n
+//
+// The -ctxkey flag is used to specify the key to obtain the current locale from context.Context
+// If is omitted, the default value is i18nLocale
+//
+// The -defaultlocale flag is used to specify the default language locale.
+// The default language locale will be used when obtaining the translation value for String, Error methods
+// and without or invalid the language locale for Trans, Lang methods
 //
 // The -type flag accepts a comma-separated list of types so a single run can
 // generate methods for multiple types. The default output file is t_string.go,
@@ -155,7 +217,7 @@ func main() {
 			}
 		}
 		if !isIn {
-			log.Fatal("The locale specified by -defaultlocale is not found in the TOML file definition")
+			log.Fatalf("The locale `%s` by -defaultlocale is not found in the TOML", g.defaultLocale)
 		}
 	}
 
@@ -878,10 +940,10 @@ func (i %[1]s) Wrap(err error, locale string, args ...%[1]s) *I18n%[4]sErrorWrap
 }
 
 // WrapWithContext wrap another error with context.Context set for i18n TYPE Const
-//  - err another error
 //  - ctx context with Value use Key from _%[1]s_ctxKey, which pass by i18n-stringer flag -ctxkey
+//  - err another error
 //  - args optional formatting component
-func (i %[1]s) WrapWithContext(err error, ctx context.Context, args ...%[1]s) *I18n%[4]sErrorWrap {
+func (i %[1]s) WrapWithContext(ctx context.Context, err error, args ...%[1]s) *I18n%[4]sErrorWrap {
 	return &I18n%[4]sErrorWrap{err: err, origin: i, locale: _%[1]s_localeFromCtxWithFallback(ctx), args: args}
 }
 
@@ -907,7 +969,7 @@ func (e *I18n%[4]sErrorWrap) Lang() string {
 	return e.Trans()
 }
 
-// Error struct as error, get translated string use Lang
+// Error struct as error, get translated string use Trans
 func (e *I18n%[4]sErrorWrap) Error() string {
 	return e.Trans()
 }
