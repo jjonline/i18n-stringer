@@ -1,4 +1,4 @@
-package test
+package test_check_const
 
 // just check const define in TOML files
 //go:generate $GOPATH/bin/i18n-stringer -type Code,Test,Single -check

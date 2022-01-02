@@ -500,9 +500,6 @@ func (g *Generator) generate(typeName string) {
 		g.buildMap(runs, typeName)
 	}
 
-	// todo
-	fmt.Printf("%#v", runs)
-
 	// build locale support set
 	g.buildLocaleSet(typeName)
 
@@ -728,11 +725,13 @@ func camelCase(s string) string {
 func (g *Generator) declareIndexAndNameVars(runs [][]Value, typeName string) {
 	var indexes, names []string
 	for i, run := range runs {
-		index, name := g.createIndexAndNameDecl(run, typeName, fmt.Sprintf("_%d", i))
-		if len(run) != 1 {
-			indexes = append(indexes, index)
+		for _, locale := range g.parser.locales {
+			index, name := g.createIndexAndNameDecl(run, typeName, fmt.Sprintf("_%d", i), locale)
+			if len(run) != 1 {
+				indexes = append(indexes, index)
+			}
+			names = append(names, name)
 		}
-		names = append(names, name)
 	}
 	g.Printf("const (\n")
 	for _, name := range names {
@@ -751,23 +750,39 @@ func (g *Generator) declareIndexAndNameVars(runs [][]Value, typeName string) {
 
 // declareIndexAndNameVar is the single-run version of declareIndexAndNameVars
 func (g *Generator) declareIndexAndNameVar(run []Value, typeName string) {
-	index, name := g.createIndexAndNameDecl(run, typeName, "")
-	g.Printf("const %s\n", name)
-	g.Printf("var %s\n", index)
+	var indexes, names []string
+	for _, locale := range g.parser.locales {
+		// g.declareIndexAndNameVar(values, typeName, locale)
+		index, name := g.createIndexAndNameDecl(run, typeName, "", locale)
+		indexes = append(indexes, index)
+		names = append(names, name)
+	}
+	g.Printf("const (\n")
+	for _, name := range names {
+		g.Printf("\t%s\n", name)
+	}
+	g.Printf(")\n\n")
+
+	g.Printf("var (")
+	for _, index := range indexes {
+		g.Printf("\t%s\n", index)
+	}
+	g.Printf(")\n\n")
 }
 
 // createIndexAndNameDecl returns the pair of declarations for the run. The caller will add "const" and "var".
-func (g *Generator) createIndexAndNameDecl(run []Value, typeName string, suffix string) (string, string) {
+func (g *Generator) createIndexAndNameDecl(run []Value, typeName string, suffix, locale string) (string, string) {
+	camelLocale := camelCase(locale)
 	b := new(bytes.Buffer)
 	indexes := make([]int, len(run))
 	for i := range run {
-		b.WriteString(run[i].name)
+		b.WriteString(g.parser.GetLocaleValue(run[i].originalName, locale))
 		indexes[i] = b.Len()
 	}
-	nameConst := fmt.Sprintf("_%s_name%s = %q", typeName, suffix, b.String())
+	nameConst := fmt.Sprintf("_%s_%s_name%s = %q", typeName, camelLocale, suffix, b.String())
 	nameLen := b.Len()
 	b.Reset()
-	_, _ = fmt.Fprintf(b, "_%s_index%s = [...]uint%d{0, ", typeName, suffix, usize(nameLen))
+	_, _ = fmt.Fprintf(b, "_%s_%s_index%s = [...]uint%d{0, ", typeName, camelLocale, suffix, usize(nameLen))
 	for i, v := range indexes {
 		if i > 0 {
 			_, _ = fmt.Fprintf(b, ", ")
@@ -779,60 +794,94 @@ func (g *Generator) createIndexAndNameDecl(run []Value, typeName string, suffix 
 }
 
 // declareNameVars declares the concatenated names string representing all the values in the runs.
-func (g *Generator) declareNameVars(runs [][]Value, typeName string, suffix string) {
-	g.Printf("const _%s_name%s = \"", typeName, suffix)
-	for _, run := range runs {
-		for i := range run {
-			g.Printf("%s", run[i].name)
+func (g *Generator) declareNameVars(runs [][]Value, typeName string) {
+	g.Printf("const (\n")
+	for _, locale := range g.parser.locales {
+		g.Printf("_%s_%s_name = \"", typeName, camelCase(locale))
+		for _, run := range runs {
+			for i := range run {
+				g.Printf("%s", g.parser.GetLocaleValue(run[i].originalName, locale))
+			}
 		}
+		g.Printf("\"\n")
 	}
-	g.Printf("\"\n")
+	g.Printf(")\n")
 }
 
 // buildOneRun generates the variables and String method for a single run of contiguous values.
 func (g *Generator) buildOneRun(runs [][]Value, typeName string) {
 	values := runs[0]
 	g.Printf("\n")
+
+	// declare const and var
 	g.declareIndexAndNameVar(values, typeName)
+
+	// build case
+	temp := new(bytes.Buffer)
+	for _, locale := range g.parser.locales {
+		temp.WriteString(fmt.Sprintf(i18nOneRunCase, typeName, camelCase(locale), locale))
+	}
+	caseString := strings.TrimRight(temp.String(), "\n")
+
 	// The generated code is simple enough to write as a Printf format.
 	lessThanZero := ""
 	if values[0].signed {
 		lessThanZero = "i < 0 || "
 	}
+
+	camelOne := camelCase(g.parser.locales[0])
 	if values[0].value == 0 { // Signed or unsigned, 0 is still 0.
-		g.Printf(stringOneRun, typeName, usize(len(values)), lessThanZero)
+		g.Printf(i18nOneStringRun, typeName, camelOne, lessThanZero, caseString)
 	} else {
-		g.Printf(stringOneRunWithOffset, typeName, values[0].String(), usize(len(values)), lessThanZero)
+		g.Printf(i18nOneRunWithOffset, typeName, values[0].String(), camelOne, lessThanZero, caseString)
 	}
 }
 
 // Arguments to format are:
 //	[1]: type name
-//	[2]: size of index element (8 for uint8 etc.)
+//	[2]: camelCase locale name
 //	[3]: less than zero check (for signed types)
-const stringOneRun = `// String type to fmt.Stringer interface use default locale
-func (i %[1]s) String() string {
-	if %[3]si >= %[1]s(len(_%[1]s_index)-1) {
-		return "%[1]s(" + strconv.FormatInt(int64(i), 10) + ")"
+//	[4]: case branch
+const i18nOneStringRun = `// _transOne translate one CONST
+func (i %[1]s) _transOne(locale string) string {
+	if %[3]si >= %[1]s(len(_%[1]s_%[2]s_index)-1) {
+		return "%[1]s["+ locale +"](" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _%[1]s_name[_%[1]s_index[i]:_%[1]s_index[i+1]]
+
+	switch locale {
+		%[4]s
+	default:	
+		return ""
+	}
 }
 `
 
 // Arguments to format are:
 //	[1]: type name
+//	[2]: camelCase locale name
+//	[3]: locale name
+const i18nOneRunCase = `case "%[3]s":
+	return _%[1]s_%[2]s_name[_%[1]s_%[2]s_index[i]:_%[1]s_%[2]s_index[i+1]]
+`
+
+// Arguments to format are:
+//	[1]: type name
 //	[2]: lowest defined value for type, as a string
-//	[3]: size of index element (8 for uint8 etc.)
+//	[3]: camelCase locale name
 //	[4]: less than zero check (for signed types)
-/*
- */
-const stringOneRunWithOffset = `// String type to fmt.Stringer interface use default locale
-func (i %[1]s) String() string {
+//	[5]: case branch
+const i18nOneRunWithOffset = `// _transOne translate one CONST
+func (i %[1]s) _transOne(locale string) string {
 	i -= %[2]s
-	if %[4]si >= %[1]s(len(_%[1]s_index)-1) {
-		return "%[1]s(" + strconv.FormatInt(int64(i + %[2]s), 10) + ")"
+	if %[4]si >= %[1]s(len(_%[1]s_%[3]s_index)-1) {
+		return "%[1]s["+ locale +"](" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _%[1]s_name[_%[1]s_index[i] : _%[1]s_index[i+1]]
+
+	switch locale {
+		%[5]s
+	default:	
+		return ""
+	}
 }
 `
 
@@ -841,29 +890,37 @@ func (i %[1]s) String() string {
 func (g *Generator) buildMultipleRuns(runs [][]Value, typeName string) {
 	g.Printf("\n")
 	g.declareIndexAndNameVars(runs, typeName)
-	g.Printf("// String type to fmt.Stringer interface use default locale\n")
-	g.Printf("func (i %s) String() string {\n", typeName)
-	g.Printf("\tswitch {\n")
-	for i, values := range runs {
-		if len(values) == 1 {
-			g.Printf("\tcase i == %s:\n", &values[0])
-			g.Printf("\t\treturn _%s_name_%d\n", typeName, i)
-			continue
+	g.Printf("// _transOne translate one CONST\n")
+	g.Printf("func (i %s) _transOne(locale string) string {\n", typeName)
+	g.Printf("\tswitch %s {\n", "locale")
+	for _, locale := range g.parser.locales {
+		camelLocale := camelCase(locale)
+		g.Printf("\tcase \"%s\":\n", locale)
+		g.Printf("\tswitch {\n")
+		for i, values := range runs {
+			if len(values) == 1 {
+				g.Printf("\tcase i == %s:\n", &values[0])
+				g.Printf("\t\treturn _%s_%s_name_%d\n", typeName, camelLocale, i)
+				continue
+			}
+			if values[0].value == 0 && !values[0].signed {
+				// For an unsigned lower bound of 0, "0 <= i" would be redundant.
+				g.Printf("\tcase i <= %s:\n", &values[len(values)-1])
+			} else {
+				g.Printf("\tcase %s <= i && i <= %s:\n", &values[0], &values[len(values)-1])
+			}
+			if values[0].value != 0 {
+				g.Printf("\t\ti -= %s\n", &values[0])
+			}
+			g.Printf("\t\treturn _%s_%s_name_%d[_%s_%s_index_%d[i]:_%s_%s_index_%d[i+1]]\n",
+				typeName, camelLocale, i, typeName, camelLocale, i, typeName, camelLocale, i)
 		}
-		if values[0].value == 0 && !values[0].signed {
-			// For an unsigned lower bound of 0, "0 <= i" would be redundant.
-			g.Printf("\tcase i <= %s:\n", &values[len(values)-1])
-		} else {
-			g.Printf("\tcase %s <= i && i <= %s:\n", &values[0], &values[len(values)-1])
-		}
-		if values[0].value != 0 {
-			g.Printf("\t\ti -= %s\n", &values[0])
-		}
-		g.Printf("\t\treturn _%s_name_%d[_%s_index_%d[i]:_%s_index_%d[i+1]]\n",
-			typeName, i, typeName, i, typeName, i)
+		g.Printf("\tdefault:\n")
+		g.Printf("\t\treturn \"%s[\"+locale+\"](\" + strconv.FormatInt(int64(i), 10) + \")\"\n", typeName)
+		g.Printf("\t}\n")
 	}
 	g.Printf("\tdefault:\n")
-	g.Printf("\t\treturn \"%s(\" + strconv.FormatInt(int64(i), 10) + \")\"\n", typeName)
+	g.Printf("\t\treturn \"\"\n")
 	g.Printf("\t}\n")
 	g.Printf("}\n")
 }
@@ -872,39 +929,72 @@ func (g *Generator) buildMultipleRuns(runs [][]Value, typeName string) {
 // It's a rare situation but has simple code.
 func (g *Generator) buildMap(runs [][]Value, typeName string) {
 	g.Printf("\n")
-	g.declareNameVars(runs, typeName, "")
-	g.Printf("\nvar _%s_map = map[%s]string{\n", typeName, typeName)
-	n := 0
-	for _, values := range runs {
-		for _, value := range values {
-			g.Printf("\t%s: _%s_name[%d:%d],\n", &value, typeName, n, n+len(value.name))
-			n += len(value.name)
+	g.declareNameVars(runs, typeName)
+	g.Printf("\nvar (")
+	for _, locale := range g.parser.locales {
+		camelLocale := camelCase(locale)
+		g.Printf("\n_%s_%s_map = map[%s]string{\n", typeName, camelLocale, typeName)
+		n := 0
+		for _, values := range runs {
+			for _, value := range values {
+				textVal := g.parser.GetLocaleValue(value.originalName, locale)
+				g.Printf("\t%s: _%s_%s_name[%d:%d],\n", &value, typeName, camelLocale, n, n+len(textVal))
+				n += len(textVal)
+			}
 		}
+		g.Printf("}")
 	}
-	g.Printf("}\n\n")
-	g.Printf(stringMap, typeName)
+	g.Printf(")\n")
+
+	// build case
+	temp := new(bytes.Buffer)
+	for _, locale := range g.parser.locales {
+		temp.WriteString(fmt.Sprintf(stringMapCase, typeName, camelCase(locale), locale))
+	}
+	caseString := strings.TrimRight(temp.String(), "\n")
+	g.Printf(stringMap, typeName, caseString)
 }
 
-// Argument to format is the type name.
-const stringMap = `func (i %[1]s) String() string {
-	if str, ok := _%[1]s_map[i]; ok {
+// Arguments to format are:
+//	[1]: type name
+//	[2]: camelCase locale name
+//	[2]: locale name
+const stringMapCase = `case "%[3]s":
+	if str, ok := _%[1]s_%[2]s_map[i]; ok {
 		return str
 	}
-	return "%[1]s(" + strconv.FormatInt(int64(i), 10) + ")"
+	return "%[1]s["+ locale +"](" + strconv.FormatInt(int64(i), 10) + ")"
+`
+
+// Arguments to format are:
+//	[1]: type name
+//	[2]: case branch
+const stringMap = `// _transOne translate one CONST
+func (i %[1]s) _transOne(locale string) string {
+	switch locale {
+		%[2]s
+	default:	
+		return ""
+	}
 }
 `
 
 // buildLocaleSet build locale support mark map
 func (g *Generator) buildLocaleSet(typeName string) {
-	// todo
 	g.Printf("\n")
-	g.Printf(i18nLocaleSet, typeName)
+	temp := new(bytes.Buffer)
+	for idx, locale := range g.parser.locales {
+		temp.WriteString(fmt.Sprintf("\"%s\": %d, ", locale, idx))
+	}
+	g.Printf(i18nLocaleSet, typeName, temp.String())
 	g.Printf("\n\n")
 }
 
 // locale support mark
+// 1% typeName
+// 2% map k/v: "en": 0, "zh-hk": 1
 const i18nLocaleSet = `// _%[1]s_supported All supported locales and text offset information
-var _%[1]s_supported = map[string]int{"zh-hk": 0}`
+var _%[1]s_supported = map[string]int{%[2]s}`
 
 // buildCommFunc build common function
 func (g *Generator) buildCommFunc(typeName string) {
@@ -926,6 +1016,15 @@ var _%[1]s_defaultLocale = "%[2]s"
 // _%[1]s_ctxKey Key from context.Context Value get locale
 // generated pass by i18n-stringer flag -ctxkey, Don't assign directly
 var _%[1]s_ctxKey = "%[3]s"
+
+// WARNING: You should use Trans, Lang, Wrap, WrapWithContext method instead
+//  - You should not use this method in an internationalized language environment, as well as method Error.
+//  - Because this method always returns the translation value of the default language.
+//  - This method implements the fmt.Stringer interface, so that you can output it directly by package fmt,
+//  - If you understand the above mechanism then you can use this method with confidence
+func (i %[1]s) String() string {
+	return i._trans(_%[1]s_defaultLocale)
+}
 
 // WARNING: You should use Trans, Lang, Wrap, WrapWithContext method instead
 //  - You should not use this method in an internationalized language environment, as well as method String.
@@ -1052,7 +1151,15 @@ func (g *Generator) buildI18nTransFunc(typeName string) {
 // 1% typeName
 const i18nTransFun = `// _trans trustworthy parameters inside method
 func (i %[1]s) _trans(locale string, args ...%[1]s) string {
-	return ""
+	msg := i._transOne(locale)
+	if len(args) > 0 {
+		var com []string
+		for _, arg := range args {
+			com = append(com, arg._transOne(locale))
+		}
+		return fmt.Sprintf(msg, com)
+	}
+	return msg
 }`
 
 // +++++++++++++++++++++++++++

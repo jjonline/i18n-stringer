@@ -1,4 +1,4 @@
-package test
+package test_use_define_path
 
 //go:generate $GOPATH/bin/i18n-stringer -type Code,Test,Single -tomlpath language -output stringer.go
 

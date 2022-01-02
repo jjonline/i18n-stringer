@@ -1,4 +1,4 @@
-package test
+package test_use_file
 
 //go:generate $GOPATH/bin/i18n-stringer -type Code,Test,Single
 

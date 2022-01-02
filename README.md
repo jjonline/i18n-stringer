@@ -173,6 +173,8 @@ Directory tree
 
 Given the name of a (signed or unsigned) integer type T that has constants defined at file `code.go`
 ````
+pacage foo
+
 type Pill int
 
 const (
@@ -198,8 +200,8 @@ running this command
 i18n-stringer -type=Pill
 ````
 
-in the same directory will create the file pill_i18n_string.go, in package painkiller,
-containing a definition of, and a struct I18nPillErrorWrap will also be created
+in the same directory will create the file `pill_i18n_string.go`, in package `foo`,
+containing a definition of, and a struct `I18nPillErrorWrap` will also be created
 
 type `Pill` Added method
 ````
@@ -212,7 +214,7 @@ func (Pill) Lang(ctx context.Context, args ...Pill) string
 func (Pill) Trans(locale string, args ...Pill) string
 ````
 
-now you can use type `Pill` method with the locale identifier to get the text translation value
+Now you can use type `Pill`'s methods with the locale identifier to get the translation value
 
 因部分翻譯文本中可能會使用諸如`%s`類型的替換佔位符在代碼中實時更改，建議規劃好整形數值區間，
 某些區間的值專門用於替換`%s`的。
