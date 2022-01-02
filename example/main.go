@@ -13,25 +13,36 @@ func main() {
 	// ++++++++++++++++++++
 
 	// Specify the language locale use string param
-	fmt.Println("testCase-1")
+	fmt.Println("-----\ntestCase-1")
 	fmt.Println(lang.MerchantLoginInvalid.Trans("zh_cn", lang.ComUserName))
 	fmt.Println(lang.Ok.Trans("zh_cn"))
 
 	// Specify the language locale invalid, default language translation will be output
-	fmt.Println("testCase-2")
+	fmt.Println("-----\ntestCase-2")
 	fmt.Println(lang.MerchantLoginInvalid.Trans("zh-cn", lang.ComUserName))
 
 	// can not be formatted
-	fmt.Println("testCase-3")
+	fmt.Println("-----\ntestCase-3")
 	fmt.Println(lang.MerchantLoginInvalid.String())
 
 	// call String method
-	fmt.Println("testCase-4")
+	fmt.Println("-----\ntestCase-4")
 	fmt.Println(lang.SubDirectoryTest)
 
 	// Specify the language locale use context.Context param
-	fmt.Println("testCase-5")
+	fmt.Println("-----\ntestCase-5")
 	ctx := context.WithValue(context.TODO(), "i18n", "en") // Attention the VALUE of second parameter
 	fmt.Println(lang.MerchantLoginInvalid.Lang(ctx, lang.ComUserName))
 	fmt.Println(lang.Ok.Lang(ctx))
+
+	// use ErrorWrap struct
+	// JUST used when you need to wrap another error return
+	fmt.Println("-----\ntestCase-6")
+	wrapErr := fmt.Errorf("this is an error need to be wrapped")
+	err := lang.MerchantLoginInvalid.Wrap(wrapErr, "en")
+	fmt.Println(err.Translate()) // can not be formatted
+	fmt.Println(err)             // use String method as fmt.Stringer, can not be formatted
+	fmt.Println(err.Unwrap())    // get wrapped error
+	err1 := lang.MerchantLoginInvalid.Wrap(wrapErr, "en", lang.ComUserName)
+	fmt.Println(err1.Translate()) // can be formatted
 }
