@@ -500,6 +500,9 @@ func (g *Generator) generate(typeName string) {
 		g.buildMap(runs, typeName)
 	}
 
+	// todo
+	fmt.Printf("%#v", runs)
+
 	// build locale support set
 	g.buildLocaleSet(typeName)
 
@@ -711,7 +714,7 @@ func camelCase(s string) string {
 			j = false
 			k = true
 		}
-		if k && d == '_' && num > i && s[i+1] >= 'a' && s[i+1] <= 'z' {
+		if k && (d == '_' || d == '-') && num > i && s[i+1] >= 'a' && s[i+1] <= 'z' {
 			j = true
 			continue
 		}
@@ -916,10 +919,12 @@ func (g *Generator) buildCommFunc(typeName string) {
 // 3% default context get locale key name
 // 4% typeName for Capitalize the first letter
 // 5% just %s itself
-const commFunc = `// _%[1]s_defaultLocale default locale generated pass by i18n-stringer flag -defaultlocale, Don't assign directly
+const commFunc = `// _%[1]s_defaultLocale default locale
+// generated pass by i18n-stringer flag -defaultlocale, Don't assign directly
 var _%[1]s_defaultLocale = "%[2]s"
 
-// _ctxKey Key of set used locale from context.Context Value, Don't assign directly
+// _%[1]s_ctxKey Key from context.Context Value get locale
+// generated pass by i18n-stringer flag -ctxkey, Don't assign directly
 var _%[1]s_ctxKey = "%[3]s"
 
 // WARNING: You should use Trans, Lang, Wrap, WrapWithContext method instead
@@ -928,7 +933,7 @@ var _%[1]s_ctxKey = "%[3]s"
 //  - This method implements the error interface, so that you can return the value as an error,
 //  - If you understand the above mechanism then you can use this method with confidence
 func (i %[1]s) Error() string {
-	return i.String()
+	return i._trans(_%[1]s_defaultLocale)
 }
 
 // Wrap another error with locale set for i18n TYPE Const
@@ -959,19 +964,19 @@ type I18n%[4]sErrorWrap struct {
 	args   []%[1]s // formatted output replacement component
 }
 
-// Trans get translated string
-func (e *I18n%[4]sErrorWrap) Trans() string {
+// Translate get translated string
+func (e *I18n%[4]sErrorWrap) Translate() string {
 	return e.origin.Trans(e.locale, e.args...)
 }
 
-// Lang alias of Trans
-func (e *I18n%[4]sErrorWrap) Lang() string {
-	return e.Trans()
+// String implement fmt.Stringer, get translated string use Translate
+func (e *I18n%[4]sErrorWrap) String() string {
+	return e.Translate()
 }
 
-// Error struct as error, get translated string use Trans
+// Error struct as error, get translated string use Translate
 func (e *I18n%[4]sErrorWrap) Error() string {
-	return e.Trans()
+	return e.Translate()
 }
 
 // Format string form inside error and TOML define
@@ -981,6 +986,11 @@ func (e *I18n%[4]sErrorWrap) Format() string {
 		return e.Error()
 	}
 	return fmt.Sprintf("%[5]s (%[5]s)", e.Error(), e.err.Error())
+}
+
+// Value get original type value
+func (e *I18n%[4]sErrorWrap) Value() %[1]s {
+	return e.origin
 }
 
 // Unwrap an error. Get the error inside
@@ -1022,8 +1032,11 @@ func _%[1]s_localeFromCtxWithFallback(ctx context.Context) string {
 		return _%[1]s_defaultLocale
 	}
 	v := ctx.Value(_%[1]s_ctxKey)
-	if v != nil && _%[1]s_isLocaleSupport(v.(string)) {
-		return v.(string)
+	if v == nil {
+		return _%[1]s_defaultLocale
+	}
+	if vv, ok := v.(string); ok && _%[1]s_isLocaleSupport(vv) {
+		return vv
 	}
 	return _%[1]s_defaultLocale
 }`
@@ -1066,6 +1079,17 @@ func newParser(path string) *Parser {
 		localesMap: make(map[string]map[string]string, 0),
 		path:       path,
 	}
+}
+
+// GetLocaleValue Get the value of the specified key in the specified locale defined by TOML
+// If it doesn't exist, return the key value itself
+func (p *Parser) GetLocaleValue(key, locale string) string {
+	if items, ok := p.localesMap[locale]; ok {
+		if item, exist := items[key]; exist {
+			return item
+		}
+	}
+	return key
 }
 
 // parse parse toml config file
