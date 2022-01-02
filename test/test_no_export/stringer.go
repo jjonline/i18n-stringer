@@ -181,11 +181,11 @@ func _code_no_export_localeFromCtxWithFallback(ctx context.Context) string {
 func (i code_no_export) _trans(locale string, args ...code_no_export) string {
 	msg := i._transOne(locale)
 	if len(args) > 0 {
-		var com []string
+		var com []interface{}
 		for _, arg := range args {
 			com = append(com, arg._transOne(locale))
 		}
-		return fmt.Sprintf(msg, com)
+		return fmt.Sprintf(msg, com...)
 	}
 	return msg
 }

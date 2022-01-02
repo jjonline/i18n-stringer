@@ -182,11 +182,11 @@ func _RuneOne_localeFromCtxWithFallback(ctx context.Context) string {
 func (i RuneOne) _trans(locale string, args ...RuneOne) string {
 	msg := i._transOne(locale)
 	if len(args) > 0 {
-		var com []string
+		var com []interface{}
 		for _, arg := range args {
 			com = append(com, arg._transOne(locale))
 		}
-		return fmt.Sprintf(msg, com)
+		return fmt.Sprintf(msg, com...)
 	}
 	return msg
 }
@@ -384,11 +384,11 @@ func _RuneMulti_localeFromCtxWithFallback(ctx context.Context) string {
 func (i RuneMulti) _trans(locale string, args ...RuneMulti) string {
 	msg := i._transOne(locale)
 	if len(args) > 0 {
-		var com []string
+		var com []interface{}
 		for _, arg := range args {
 			com = append(com, arg._transOne(locale))
 		}
-		return fmt.Sprintf(msg, com)
+		return fmt.Sprintf(msg, com...)
 	}
 	return msg
 }
@@ -600,11 +600,11 @@ func _RuneMap_localeFromCtxWithFallback(ctx context.Context) string {
 func (i RuneMap) _trans(locale string, args ...RuneMap) string {
 	msg := i._transOne(locale)
 	if len(args) > 0 {
-		var com []string
+		var com []interface{}
 		for _, arg := range args {
 			com = append(com, arg._transOne(locale))
 		}
-		return fmt.Sprintf(msg, com)
+		return fmt.Sprintf(msg, com...)
 	}
 	return msg
 }

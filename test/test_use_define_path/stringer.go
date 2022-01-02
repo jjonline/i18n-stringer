@@ -332,11 +332,11 @@ func _Code_localeFromCtxWithFallback(ctx context.Context) string {
 func (i Code) _trans(locale string, args ...Code) string {
 	msg := i._transOne(locale)
 	if len(args) > 0 {
-		var com []string
+		var com []interface{}
 		for _, arg := range args {
 			com = append(com, arg._transOne(locale))
 		}
-		return fmt.Sprintf(msg, com)
+		return fmt.Sprintf(msg, com...)
 	}
 	return msg
 }
@@ -550,11 +550,11 @@ func _Test_localeFromCtxWithFallback(ctx context.Context) string {
 func (i Test) _trans(locale string, args ...Test) string {
 	msg := i._transOne(locale)
 	if len(args) > 0 {
-		var com []string
+		var com []interface{}
 		for _, arg := range args {
 			com = append(com, arg._transOne(locale))
 		}
-		return fmt.Sprintf(msg, com)
+		return fmt.Sprintf(msg, com...)
 	}
 	return msg
 }
@@ -758,11 +758,11 @@ func _Single_localeFromCtxWithFallback(ctx context.Context) string {
 func (i Single) _trans(locale string, args ...Single) string {
 	msg := i._transOne(locale)
 	if len(args) > 0 {
-		var com []string
+		var com []interface{}
 		for _, arg := range args {
 			com = append(com, arg._transOne(locale))
 		}
-		return fmt.Sprintf(msg, com)
+		return fmt.Sprintf(msg, com...)
 	}
 	return msg
 }
