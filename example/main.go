@@ -49,4 +49,5 @@ func main() {
 
 	err2 := lang.MerchantLoginInvalid.WrapWithContext(ctx, wrapErr, lang.ComUserName)
 	fmt.Println(err2.Translate()) // wrap with context.Context, can be formatted
+	fmt.Println(err2.Format())    // Format method Only used for development and debugging and not showing end users
 }
