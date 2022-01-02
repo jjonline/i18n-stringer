@@ -47,10 +47,10 @@
 // For example,
 //
 //  .
-// 	├── i18n
+//  ├── i18n
 //  │     └── en.toml
 //  │     ├── zh_cn.toml
-//  │	  └── zh_hk
+//  │     └── zh_hk
 //  │     │     ├── user.toml
 //  │     │     └── merchant.toml
 //  └── pill.go
@@ -79,11 +79,11 @@
 //
 //	func (Pill) String() string
 //	func (Pill) Error() string
-//	func (Pill) Wrap(err error, locale string, args ...T) I18nPillErrorWrap
-//	func (Pill) WrapWithContext(ctx context.Context, err error, args ...T) I18nPillErrorWrap
+//	func (Pill) Wrap(err error, locale string, args ...Pill) I18nPillErrorWrap
+//	func (Pill) WrapWithContext(ctx context.Context, err error, args ...Pill) I18nPillErrorWrap
 //	func (Pill) IsLocaleSupport(locale string) bool
-//	func (Pill) Lang(ctx context.Context, args ...RuneOne) string
-//	func (Pill) Trans(locale string, args ...RuneOne) string
+//	func (Pill) Lang(ctx context.Context, args ...Pill) string
+//	func (Pill) Trans(locale string, args ...Pill) string
 //
 // That methods will translate the value of a Pill constant to the string representation
 // of the respective value define in TOML file

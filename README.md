@@ -157,21 +157,62 @@ Flags:
 
 ## 1.7、調用/Code call
 
-整形自定義類型除了添加`func (i typ) String() string`方法以實現`fmt.Stringer`接口外，
-还会會被添加`func (i typ) Trans(locale string, args ...interface{}) string`和`func (i typ) Lang(ctx context.Context, args ...interface{}) string`方法。
-使用`Trans`方法指定字符串形式的語言類型例如`en`即可獲取翻譯文本；
-也可以使用`context.Context`攜帶語言類型值的上下文作為參數的方法`Lang`獲取翻譯文本，
-需要說明的是`context.Context`携带语言类型的键名由`-ctxkey`指定，默認鍵名為`i18nLocale`。
+> For example
 
-In addition to adding the `func (i typ) String() string` method to implement the `fmt.Stringer` interface,
-the shaping custom type will also be
-added with `func (i typ) Trans(locale string, args ...interface{}) string` and `func ( i typ) Lang(ctx context.Context, args ...interface{}) string` method. 
-Use the `Trans` method to specify the language type in the form of a string, 
-such as `en` to get the translated text; 
-you can also use the `context.Context` method that carries the
-context of the language type value as a parameter to get the translated text.
-The key name of `context.Context` carrying language type is specified by `-ctxkey`, 
-and the default key name is `i18nLocale`.
+Directory tree
+````
+.
+├── i18n
+│     └── en.toml
+│     ├── zh_cn.toml
+│     └── zh_hk
+│     │     ├── user.toml
+│     │     └── merchant.toml
+└── code.go
+````
+
+Given the name of a (signed or unsigned) integer type T that has constants defined at file `code.go`
+````
+type Pill int
+
+const (
+    Placebo Pill = iota
+    Aspirin
+    Ibuprofen
+    Paracetamol
+    Acetaminophen = Paracetamol // NOTE: with the same value will be ignored, do not use same value
+)
+````
+
+Define TOML key-value pairs in all locale TOML file,
+example for `i18n/en.toml`
+````
+Placebo="en locale Placebo"
+Aspirin="en locale Aspirin"
+Ibuprofen="en locale Ibuprofen"
+Acetaminophen="en locale Acetaminophen"
+````
+
+running this command
+````
+i18n-stringer -type=Pill
+````
+
+in the same directory will create the file pill_i18n_string.go, in package painkiller,
+containing a definition of, and a struct I18nPillErrorWrap will also be created
+
+type `Pill` Added method
+````
+func (Pill) String() string
+func (Pill) Error() string
+func (Pill) Wrap(err error, locale string, args ...Pill) I18nPillErrorWrap
+func (Pill) WrapWithContext(ctx context.Context, err error, args ...Pill) I18nPillErrorWrap
+func (Pill) IsLocaleSupport(locale string) bool
+func (Pill) Lang(ctx context.Context, args ...Pill) string
+func (Pill) Trans(locale string, args ...Pill) string
+````
+
+now you can use type `Pill` method with the locale identifier to get the text translation value
 
 因部分翻譯文本中可能會使用諸如`%s`類型的替換佔位符在代碼中實時更改，建議規劃好整形數值區間，
 某些區間的值專門用於替換`%s`的。
