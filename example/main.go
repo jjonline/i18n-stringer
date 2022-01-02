@@ -39,10 +39,14 @@ func main() {
 	// JUST used when you need to wrap another error return
 	fmt.Println("-----\ntestCase-6")
 	wrapErr := fmt.Errorf("this is an error need to be wrapped")
-	err := lang.MerchantLoginInvalid.Wrap(wrapErr, "en")
+	err := lang.MerchantLoginInvalid.Wrap(wrapErr, "zh_cn")
 	fmt.Println(err.Translate()) // can not be formatted
 	fmt.Println(err)             // use String method as fmt.Stringer, can not be formatted
 	fmt.Println(err.Unwrap())    // get wrapped error
-	err1 := lang.MerchantLoginInvalid.Wrap(wrapErr, "en", lang.ComUserName)
+
+	err1 := lang.MerchantLoginInvalid.Wrap(wrapErr, "zh_cn", lang.ComUserName)
 	fmt.Println(err1.Translate()) // can be formatted
+
+	err2 := lang.MerchantLoginInvalid.WrapWithContext(ctx, wrapErr, lang.ComUserName)
+	fmt.Println(err2.Translate()) // wrap with context.Context, can be formatted
 }
