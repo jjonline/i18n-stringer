@@ -1153,11 +1153,11 @@ const i18nTransFun = `// _trans trustworthy parameters inside method
 func (i %[1]s) _trans(locale string, args ...%[1]s) string {
 	msg := i._transOne(locale)
 	if len(args) > 0 {
-		var com []string
+		var com []interface{}
 		for _, arg := range args {
 			com = append(com, arg._transOne(locale))
 		}
-		return fmt.Sprintf(msg, com)
+		return fmt.Sprintf(msg, com...)
 	}
 	return msg
 }`
