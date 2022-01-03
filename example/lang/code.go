@@ -4,7 +4,10 @@ package lang
 //go:generate $GOPATH/bin/i18n-stringer -type ErrorCode -tomlpath i18n -check
 
 // Second generation
-//go:generate $GOPATH/bin/i18n-stringer -type ErrorCode -defaultlocale zh_cn -ctxkey i18n -tomlpath i18n -defaultlocale en -output i118n_stringer.go
+//go:generate $GOPATH/bin/i18n-stringer -type ErrorCode -ctxkey i18n -tomlpath i18n -defaultlocale en -output i118n_stringer.go
+
+// or write like this, attention COMMENT prefix #
+//#go:generate $GOPATH/bin/i18n-stringer -type=ErrorCode -ctxkey=i18n -tomlpath=i18n -defaultlocale=en -output=i118n_stringer.go
 
 // ErrorCode Define a custom shaping type that supports i18n as an error code
 type ErrorCode uint
