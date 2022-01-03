@@ -850,8 +850,9 @@ func (i %[1]s) _transOne(locale string) string {
 
 	switch locale {
 		%[4]s
-	default:	
-		return "Normally unreachable: Undefined locale " + locale
+	default:
+		// Normally unreachable
+		return ""
 	}
 }
 `
@@ -879,8 +880,9 @@ func (i %[1]s) _transOne(locale string) string {
 
 	switch locale {
 		%[5]s
-	default:	
-		return "Normally unreachable: Undefined locale " + locale
+	default:
+		// Normally unreachable
+		return ""
 	}
 }
 `
@@ -920,7 +922,8 @@ func (g *Generator) buildMultipleRuns(runs [][]Value, typeName string) {
 		g.Printf("\t}\n")
 	}
 	g.Printf("\tdefault:\n")
-	g.Printf("\t\treturn \"Normally unreachable: Undefined locale \" + locale\n")
+	g.Printf("\t// Normally unreachable\n")
+	g.Printf("\t\treturn \"\"\n")
 	g.Printf("\t}\n")
 	g.Printf("}\n")
 }
@@ -973,8 +976,9 @@ const stringMap = `// _transOne translate one CONST
 func (i %[1]s) _transOne(locale string) string {
 	switch locale {
 		%[2]s
-	default:	
-		return "Normally unreachable: Undefined locale " + locale
+	default:
+		// Normally unreachable
+		return ""
 	}
 }
 `
