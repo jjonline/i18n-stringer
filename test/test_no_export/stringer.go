@@ -39,7 +39,7 @@ func (i code_no_export) _transOne(locale string) string {
 	case "zh-hk":
 		return _code_no_export_ZhHk_name[_code_no_export_ZhHk_index[i]:_code_no_export_ZhHk_index[i+1]]
 	default:
-		return ""
+		return "Normally unreachable: Undefined locale " + locale
 	}
 }
 

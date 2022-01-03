@@ -23,7 +23,7 @@
 // The file is created in the same package and directory as the package that defines T.
 // It has helpful defaults designed for use with go generate.
 //
-// Stringer works best with constants that are consecutive values such as created using iota,
+// fmt.Stringer works best with constants that are consecutive values such as created using iota,
 // but creates good code regardless.
 //
 // For example, given this snippet,
@@ -851,7 +851,7 @@ func (i %[1]s) _transOne(locale string) string {
 	switch locale {
 		%[4]s
 	default:	
-		return ""
+		return "Normally unreachable: Undefined locale " + locale
 	}
 }
 `
@@ -880,7 +880,7 @@ func (i %[1]s) _transOne(locale string) string {
 	switch locale {
 		%[5]s
 	default:	
-		return ""
+		return "Normally unreachable: Undefined locale " + locale
 	}
 }
 `
@@ -920,7 +920,7 @@ func (g *Generator) buildMultipleRuns(runs [][]Value, typeName string) {
 		g.Printf("\t}\n")
 	}
 	g.Printf("\tdefault:\n")
-	g.Printf("\t\treturn \"\"\n")
+	g.Printf("\t\treturn \"Normally unreachable: Undefined locale \" + locale\n")
 	g.Printf("\t}\n")
 	g.Printf("}\n")
 }
@@ -974,7 +974,7 @@ func (i %[1]s) _transOne(locale string) string {
 	switch locale {
 		%[2]s
 	default:	
-		return ""
+		return "Normally unreachable: Undefined locale " + locale
 	}
 }
 `
