@@ -997,7 +997,7 @@ func (g *Generator) buildLocaleSet(typeName string) {
 // locale support mark
 // 1% typeName
 // 2% map k/v: "en": 0, "zh-hk": 1
-const i18nLocaleSet = `// _%[1]s_supported All supported locales and text offset information
+const i18nLocaleSet = `// _%[1]s_supported All supported locales record
 var _%[1]s_supported = map[string]int{%[2]s}`
 
 // buildCommFunc build common function

@@ -44,7 +44,7 @@ func (i code_no_export) _transOne(locale string) string {
 	}
 }
 
-// _code_no_export_supported All supported locales and text offset information
+// _code_no_export_supported All supported locales record
 var _code_no_export_supported = map[string]int{"en": 0, "zh-hk": 1}
 
 // _code_no_export_defaultLocale default locale

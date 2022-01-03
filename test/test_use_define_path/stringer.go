@@ -195,7 +195,7 @@ func (i Code) _transOne(locale string) string {
 	}
 }
 
-// _Code_supported All supported locales and text offset information
+// _Code_supported All supported locales record
 var _Code_supported = map[string]int{"en": 0, "zh-cn": 1, "zh-hk": 2}
 
 // _Code_defaultLocale default locale
@@ -414,7 +414,7 @@ func (i Test) _transOne(locale string) string {
 	}
 }
 
-// _Test_supported All supported locales and text offset information
+// _Test_supported All supported locales record
 var _Test_supported = map[string]int{"en": 0, "zh-cn": 1, "zh-hk": 2}
 
 // _Test_defaultLocale default locale
@@ -623,7 +623,7 @@ func (i Single) _transOne(locale string) string {
 	}
 }
 
-// _Single_supported All supported locales and text offset information
+// _Single_supported All supported locales record
 var _Single_supported = map[string]int{"en": 0, "zh-cn": 1, "zh-hk": 2}
 
 // _Single_defaultLocale default locale

@@ -45,7 +45,7 @@ func (i RuneOne) _transOne(locale string) string {
 	}
 }
 
-// _RuneOne_supported All supported locales and text offset information
+// _RuneOne_supported All supported locales record
 var _RuneOne_supported = map[string]int{"en": 0, "zh-hk": 1}
 
 // _RuneOne_defaultLocale default locale
@@ -248,7 +248,7 @@ func (i RuneMulti) _transOne(locale string) string {
 	}
 }
 
-// _RuneMulti_supported All supported locales and text offset information
+// _RuneMulti_supported All supported locales record
 var _RuneMulti_supported = map[string]int{"en": 0, "zh-hk": 1}
 
 // _RuneMulti_defaultLocale default locale
@@ -465,7 +465,7 @@ func (i RuneMap) _transOne(locale string) string {
 	}
 }
 
-// _RuneMap_supported All supported locales and text offset information
+// _RuneMap_supported All supported locales record
 var _RuneMap_supported = map[string]int{"en": 0, "zh-hk": 1}
 
 // _RuneMap_defaultLocale default locale
