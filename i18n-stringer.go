@@ -851,7 +851,7 @@ func (i %[1]s) _transOne(locale string) string {
 	switch locale {
 		%[4]s
 	default:
-		// Normally unreachable
+		// Normally unreachable, should not happen but be cautious
 		return ""
 	}
 }
@@ -881,7 +881,7 @@ func (i %[1]s) _transOne(locale string) string {
 	switch locale {
 		%[5]s
 	default:
-		// Normally unreachable
+		// Normally unreachable, should not happen but be cautious
 		return ""
 	}
 }
@@ -922,7 +922,7 @@ func (g *Generator) buildMultipleRuns(runs [][]Value, typeName string) {
 		g.Printf("\t}\n")
 	}
 	g.Printf("\tdefault:\n")
-	g.Printf("\t// Normally unreachable\n")
+	g.Printf("\t// Normally unreachable, should not happen but be cautious\n")
 	g.Printf("\t\treturn \"\"\n")
 	g.Printf("\t}\n")
 	g.Printf("}\n")
@@ -977,7 +977,7 @@ func (i %[1]s) _transOne(locale string) string {
 	switch locale {
 		%[2]s
 	default:
-		// Normally unreachable
+		// Normally unreachable, should not happen but be cautious
 		return ""
 	}
 }
