@@ -111,7 +111,7 @@ Sig01=""
 Sig02=""
 Sig03=""
 i18n-stringer: Check Warning
-i18n-stringer: key-value pairs that will not be used because there is no corresponding defined constant
+i18n-stringer: key-value pairs that will not be used because there is no corresponding constant
 i18n-stringer: You can delete the key-value pairs in the corresponding TOML file
 ************Can be deleted TOML keys of locale `en`************
 HELLO
@@ -173,7 +173,7 @@ Directory tree
 
 Given the name of a (signed or unsigned) integer type T that has constants defined at file `code.go`
 ````
-pacage foo
+package foo
 
 type Pill int
 

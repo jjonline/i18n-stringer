@@ -380,7 +380,7 @@ func (g *Generator) checkConstDefine() {
 	if len(noneUsedRecord) > 0 {
 		log.SetPrefix("i18n-stringer: ")
 		log.Printf("Check Warning")
-		log.Printf("key-value pairs that will not be used because there is no corresponding defined constant")
+		log.Printf("key-value pairs that will not be used because there is no corresponding constant")
 		log.Printf("You can delete the key-value pairs in the corresponding TOML file")
 		log.SetPrefix("")
 		for locale, items := range noneUsedRecord {
