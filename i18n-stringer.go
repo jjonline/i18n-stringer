@@ -112,9 +112,10 @@
 // The -defaultlocale flag is used to specify the default language locale.
 // The default language locale will be used when obtaining the translation value for String, Error methods
 // and without or invalid the language locale for Trans, Lang methods
+// If is omitted, the default is the one first of naturally sorted list
 //
 // The -type flag accepts a comma-separated list of types so a single run can
-// generate methods for multiple types. The default output file is t_string.go,
+// generate methods for multiple types. The default output file is t_i18n_stringer.go,
 // where t is the lower-cased name of the first type listed. It can be overridden
 // with the -output flag.
 package main
