@@ -147,7 +147,7 @@ func (i Code) _transOne(locale string) string {
 		}
 		return "Code[" + locale + "](" + strconv.FormatInt(int64(i), 10) + ")"
 	default:
-		// Normally unreachable
+		// Normally unreachable, should not happen but be cautious
 		return ""
 	}
 }
@@ -351,7 +351,7 @@ func (i Test) _transOne(locale string) string {
 			return "Test[" + locale + "](" + strconv.FormatInt(int64(i), 10) + ")"
 		}
 	default:
-		// Normally unreachable
+		// Normally unreachable, should not happen but be cautious
 		return ""
 	}
 }
@@ -556,7 +556,7 @@ func (i Single) _transOne(locale string) string {
 	case "zh-hk":
 		return _Single_ZhHk_name[_Single_ZhHk_index[i]:_Single_ZhHk_index[i+1]]
 	default:
-		// Normally unreachable
+		// Normally unreachable, should not happen but be cautious
 		return ""
 	}
 }

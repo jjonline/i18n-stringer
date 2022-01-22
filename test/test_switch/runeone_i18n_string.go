@@ -40,7 +40,7 @@ func (i RuneOne) _transOne(locale string) string {
 	case "zh-hk":
 		return _RuneOne_ZhHk_name[_RuneOne_ZhHk_index[i]:_RuneOne_ZhHk_index[i+1]]
 	default:
-		// Normally unreachable
+		// Normally unreachable, should not happen but be cautious
 		return ""
 	}
 }
@@ -243,7 +243,7 @@ func (i RuneMulti) _transOne(locale string) string {
 			return "RuneMulti[" + locale + "](" + strconv.FormatInt(int64(i), 10) + ")"
 		}
 	default:
-		// Normally unreachable
+		// Normally unreachable, should not happen but be cautious
 		return ""
 	}
 }
@@ -460,7 +460,7 @@ func (i RuneMap) _transOne(locale string) string {
 		}
 		return "RuneMap[" + locale + "](" + strconv.FormatInt(int64(i), 10) + ")"
 	default:
-		// Normally unreachable
+		// Normally unreachable, should not happen but be cautious
 		return ""
 	}
 }
