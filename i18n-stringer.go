@@ -315,7 +315,7 @@ type Package struct {
 	files []*File
 }
 
-// checkConstDefine check missing CONSTANT
+// checkConstDefine check missing CONSTANT and redundant key-value pairs
 func (g *Generator) checkConstDefine() {
 	// The missing key-value pair structure in TOML: map[typ][locale][]K
 	var notPairsRecord = make(map[string]map[string][]string)
@@ -445,7 +445,7 @@ func (g *Generator) parseConstValues(typeName string) {
 	}
 
 	if len(g.values[typeName]) == 0 {
-		log.Fatalf("No values defined in TOML for type %s", typeName)
+		log.Fatalf("No CONST values defined for type %s", typeName)
 	}
 }
 
@@ -561,7 +561,7 @@ type Value struct {
 	originalName string // The name of the constant.
 	name         string // The name with trimmed prefix.
 	// The value is stored as a bit pattern alone. The boolean tells us
-	// whether to interpret it as an int64 or a uint64; the only place
+	// whether to interpret it as an int64 or an uint64; the only place
 	// this matters is when sorting.
 	// Much of the time the str field is all we need; it is printed
 	// by Value.String.
