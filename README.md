@@ -19,6 +19,10 @@ go Version 1.16 and above for install/使用go1.16及其以上版本编译安装
 go install github.com/tvb-sz/i18n-stringer@latest
 ````
 
+或者也可以直接從release下載對應平台編譯好的二進制
+可執行程序放置於環境變量目錄下
+即可使用：[https://github.com/tvb-sz/i18n-stringer/releases](https://github.com/tvb-sz/i18n-stringer/releases)
+
 ---
 
 The `example` directory gives an example of usage witch used `gomod`
