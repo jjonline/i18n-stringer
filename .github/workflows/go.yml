@@ -18,14 +18,14 @@ jobs:
 
     - name: Build binary
       run: |
-        GOARCH=amd64 GOOS=linux CGO_ENABLED=0 go build -ldflags "-s -w" -o i18n-stringer main.go && zip -v i18n-stringer-linux-amd64.zip i18n-stringer
-        GOARCH=amd64 GOOS=darwin CGO_ENABLED=0 go build -ldflags "-s -w" -o i18n-stringer main.go && zip -v i18n-stringer-darwin-amd64.zip i18n-stringer
-        GOARCH=amd64 GOOS=windows CGO_ENABLED=0 go build -ldflags "-s -w" -o i18n-stringer.exe main.go && zip -v i18n-stringer-windows-amd64.zip i18n-stringer.exe
-        GOARCH=arm64 GOOS=linux CGO_ENABLED=0 go build -ldflags "-s -w" -o i18n-stringer main.go && zip -v i18n-stringer-linux-arm64.zip i18n-stringer
-        GOARCH=arm64 GOOS=darwin CGO_ENABLED=0 go build -ldflags "-s -w" -o i18n-stringer main.go && zip -v i18n-stringer-darwin-arm64.zip i18n-stringer
-        GOARCH=arm64 GOOS=windows CGO_ENABLED=0 go build -ldflags "-s -w" -o i18n-stringer.exe main.go && zip -v i18n-stringer-windows-arm64.zip i18n-stringer.exe
-        GOARCH=386 GOOS=linux CGO_ENABLED=0 go build -ldflags "-s -w" -o i18n-stringer main.go && zip -v i18n-stringer-linux-386.zip i18n-stringer
-        GOARCH=386 GOOS=windows CGO_ENABLED=0 go build -ldflags "-s -w" -o i18n-stringer.exe main.go && zip -v i18n-stringer-windows-386.zip i18n-stringer.exe
+        GOARCH=amd64 GOOS=linux CGO_ENABLED=0 go build -ldflags "-s -w" -o i18n-stringer i18n-stringer.go && zip -v i18n-stringer-linux-amd64.zip i18n-stringer
+        GOARCH=amd64 GOOS=darwin CGO_ENABLED=0 go build -ldflags "-s -w" -o i18n-stringer i18n-stringer.go && zip -v i18n-stringer-darwin-amd64.zip i18n-stringer
+        GOARCH=amd64 GOOS=windows CGO_ENABLED=0 go build -ldflags "-s -w" -o i18n-stringer.exe i18n-stringer.go && zip -v i18n-stringer-windows-amd64.zip i18n-stringer.exe
+        GOARCH=arm64 GOOS=linux CGO_ENABLED=0 go build -ldflags "-s -w" -o i18n-stringer i18n-stringer.go && zip -v i18n-stringer-linux-arm64.zip i18n-stringer
+        GOARCH=arm64 GOOS=darwin CGO_ENABLED=0 go build -ldflags "-s -w" -o i18n-stringer i18n-stringer.go && zip -v i18n-stringer-darwin-arm64.zip i18n-stringer
+        GOARCH=arm64 GOOS=windows CGO_ENABLED=0 go build -ldflags "-s -w" -o i18n-stringer.exe i18n-stringer.go && zip -v i18n-stringer-windows-arm64.zip i18n-stringer.exe
+        GOARCH=386 GOOS=linux CGO_ENABLED=0 go build -ldflags "-s -w" -o i18n-stringer i18n-stringer.go && zip -v i18n-stringer-linux-386.zip i18n-stringer
+        GOARCH=386 GOOS=windows CGO_ENABLED=0 go build -ldflags "-s -w" -o i18n-stringer.exe i18n-stringer.go && zip -v i18n-stringer-windows-386.zip i18n-stringer.exe
         ls -l *.zip
     - name: Auto Release
       uses: marvinpinto/action-automatic-releases@v1.2.1
