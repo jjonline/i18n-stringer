@@ -224,6 +224,11 @@ func (i Code) Error() string {
 	return i._trans(_Code_defaultLocale)
 }
 
+// Code get original type int value
+func (i Code) Code() int {
+	return int(i)
+}
+
 // Wrap another error with locale set for i18n TYPE Const
 //  - err another error
 //  - locale i18n locale name
@@ -443,6 +448,11 @@ func (i Test) Error() string {
 	return i._trans(_Test_defaultLocale)
 }
 
+// Code get original type int value
+func (i Test) Code() int {
+	return int(i)
+}
+
 // Wrap another error with locale set for i18n TYPE Const
 //  - err another error
 //  - locale i18n locale name
@@ -650,6 +660,11 @@ func (i Single) String() string {
 //  - If you understand the above mechanism then you can use this method with confidence
 func (i Single) Error() string {
 	return i._trans(_Single_defaultLocale)
+}
+
+// Code get original type int value
+func (i Single) Code() int {
+	return int(i)
 }
 
 // Wrap another error with locale set for i18n TYPE Const

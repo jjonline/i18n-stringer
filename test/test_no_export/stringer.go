@@ -29,7 +29,7 @@ var (
 // _transOne translate one CONST
 func (i code_no_export) _transOne(locale string) string {
 	i -= 1
-	if i < 0 || i >= code_no_export(len(_code_no_export_En_index)-1) {
+	if i >= code_no_export(len(_code_no_export_En_index)-1) {
 		return "code_no_export[" + locale + "](" + strconv.FormatInt(int64(i), 10) + ")"
 	}
 
@@ -71,6 +71,11 @@ func (i code_no_export) String() string {
 //  - If you understand the above mechanism then you can use this method with confidence
 func (i code_no_export) Error() string {
 	return i._trans(_code_no_export_defaultLocale)
+}
+
+// Code get original type uint8 value
+func (i code_no_export) Code() uint8 {
+	return uint8(i)
 }
 
 // Wrap another error with locale set for i18n TYPE Const

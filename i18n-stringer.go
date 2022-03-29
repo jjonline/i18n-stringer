@@ -190,6 +190,7 @@ func main() {
 		tomlPath:      ternary(*tomlpath, "i18n"),
 		defaultLocale: ternary(*defaultlocale, ""), // default locale
 		values:        make(map[string][]Value),    // init const value
+		basicType:     make(map[string]string),     // init basic TYPE value
 	}
 
 	if len(args) == 1 && isDirectory(args[0]) {
@@ -291,6 +292,7 @@ type Generator struct {
 	pkg           *Package           // Package we are scanning.
 	parser        *Parser            // toml file Parser
 	values        map[string][]Value // parse source code for TYPE CONST values map[typ][]Value
+	basicType     map[string]string  // parse source code for TYPE  map[typ]basicType, for {"ErrCode": "uint32"}
 	tomlPath      string
 	ctxKey        string
 	defaultLocale string
@@ -441,6 +443,11 @@ func (g *Generator) parseConstValues(typeName string) {
 		if file.file != nil {
 			ast.Inspect(file.file, file.genDecl)
 			g.values[typeName] = append(g.values[typeName], file.values...)
+
+			// set typ basic TYPE, for int,int64,uint,uint8 etc
+			if _, ok := g.basicType[typeName]; !ok && file.values != nil {
+				g.basicType[typeName] = file.values[0].basicType
+			}
 		}
 	}
 
@@ -565,9 +572,10 @@ type Value struct {
 	// this matters is when sorting.
 	// Much of the time the str field is all we need; it is printed
 	// by Value.String.
-	value  uint64 // Will be converted to int64 when needed.
-	signed bool   // Whether the constant is a signed type.
-	str    string // The string representation given by the "go/constant" package.
+	value     uint64 // Will be converted to int64 when needed.
+	signed    bool   // Whether the constant is a signed type.
+	str       string // The string representation given by the "go/constant" package.
+	basicType string // value of basic Type, for: int int64 uint etc
 }
 
 func (v *Value) String() string {
@@ -650,7 +658,8 @@ func (f *File) genDecl(node ast.Node) bool {
 			if !ok {
 				log.Fatalf("no value for constant %s", name)
 			}
-			info := obj.Type().Underlying().(*types.Basic).Info()
+			basic := obj.Type().Underlying().(*types.Basic)
+			info := basic.Info()
 			if info&types.IsInteger == 0 {
 				log.Fatalf("can't handle non-integer constant type %s", typ)
 			}
@@ -671,6 +680,7 @@ func (f *File) genDecl(node ast.Node) bool {
 				value:        u64,
 				signed:       info&types.IsUnsigned == 0,
 				str:          value.String(),
+				basicType:    basic.Name(),
 			}
 			v.name = v.originalName
 			f.values = append(f.values, v)
@@ -1004,7 +1014,7 @@ var _%[1]s_supported = map[string]int{%[2]s}`
 // buildCommFunc build common function
 func (g *Generator) buildCommFunc(typeName string) {
 	g.Printf("\n")
-	g.Printf(commFunc, typeName, g.defaultLocale, g.ctxKey, camelCase(typeName), "%s")
+	g.Printf(commFunc, typeName, g.defaultLocale, g.ctxKey, camelCase(typeName), "%s", g.basicType[typeName])
 	g.Printf("\n\n")
 }
 
@@ -1014,6 +1024,7 @@ func (g *Generator) buildCommFunc(typeName string) {
 // 3% default context get locale key name
 // 4% typeName for Capitalize the first letter
 // 5% just %s itself
+// 6% typ original TYPE name
 const commFunc = `// _%[1]s_defaultLocale default locale
 // generated pass by i18n-stringer flag -defaultlocale, Don't assign directly
 var _%[1]s_defaultLocale = "%[2]s"
@@ -1038,6 +1049,11 @@ func (i %[1]s) String() string {
 //  - If you understand the above mechanism then you can use this method with confidence
 func (i %[1]s) Error() string {
 	return i._trans(_%[1]s_defaultLocale)
+}
+
+// Code get original type %[6]s value
+func (i %[1]s) Code() %[6]s {
+	return %[6]s(i)
 }
 
 // Wrap another error with locale set for i18n TYPE Const

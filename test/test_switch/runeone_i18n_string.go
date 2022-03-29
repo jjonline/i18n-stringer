@@ -74,6 +74,11 @@ func (i RuneOne) Error() string {
 	return i._trans(_RuneOne_defaultLocale)
 }
 
+// Code get original type int value
+func (i RuneOne) Code() int {
+	return int(i)
+}
+
 // Wrap another error with locale set for i18n TYPE Const
 //  - err another error
 //  - locale i18n locale name
@@ -275,6 +280,11 @@ func (i RuneMulti) String() string {
 //  - If you understand the above mechanism then you can use this method with confidence
 func (i RuneMulti) Error() string {
 	return i._trans(_RuneMulti_defaultLocale)
+}
+
+// Code get original type int value
+func (i RuneMulti) Code() int {
+	return int(i)
 }
 
 // Wrap another error with locale set for i18n TYPE Const
@@ -492,6 +502,11 @@ func (i RuneMap) String() string {
 //  - If you understand the above mechanism then you can use this method with confidence
 func (i RuneMap) Error() string {
 	return i._trans(_RuneMap_defaultLocale)
+}
+
+// Code get original type int value
+func (i RuneMap) Code() int {
+	return int(i)
 }
 
 // Wrap another error with locale set for i18n TYPE Const
