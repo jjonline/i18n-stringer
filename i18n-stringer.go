@@ -79,11 +79,11 @@
 //
 //	func (Pill) String() string
 //	func (Pill) Error() string
-//	func (Pill) Wrap(err error, locale string, args ...Pill) I18nPillErrorWrap
-//	func (Pill) WrapWithContext(ctx context.Context, err error, args ...Pill) I18nPillErrorWrap
+//	func (Pill) Wrap(err error, locale string, args ...interface{}) I18nPillErrorWrap
+//	func (Pill) WrapWithContext(ctx context.Context, err error, args ...interface{}) I18nPillErrorWrap
 //	func (Pill) IsLocaleSupport(locale string) bool
-//	func (Pill) Lang(ctx context.Context, args ...Pill) string
-//	func (Pill) Trans(locale string, args ...Pill) string
+//	func (Pill) Lang(ctx context.Context, args ...interface{}) string
+//	func (Pill) Trans(locale string, args ...interface{}) string
 //
 // That methods will translate the value of a Pill constant to the string representation
 // of the respective value define in TOML file
