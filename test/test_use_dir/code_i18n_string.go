@@ -190,7 +190,7 @@ func (i Code) Code() int {
 //  - err another error
 //  - locale i18n locale name
 //  - args optional formatting component
-func (i Code) Wrap(err error, locale string, args ...Code) *I18nCodeErrorWrap {
+func (i Code) Wrap(err error, locale string, args ...interface{}) *I18nCodeErrorWrap {
 	return &I18nCodeErrorWrap{err: err, origin: i, locale: locale, args: args}
 }
 
@@ -198,7 +198,7 @@ func (i Code) Wrap(err error, locale string, args ...Code) *I18nCodeErrorWrap {
 //  - ctx context with Value use Key from _Code_ctxKey, which pass by i18n-stringer flag -ctxkey
 //  - err another error
 //  - args optional formatting component
-func (i Code) WrapWithContext(ctx context.Context, err error, args ...Code) *I18nCodeErrorWrap {
+func (i Code) WrapWithContext(ctx context.Context, err error, args ...interface{}) *I18nCodeErrorWrap {
 	return &I18nCodeErrorWrap{err: err, origin: i, locale: _Code_localeFromCtxWithFallback(ctx), args: args}
 }
 
@@ -208,10 +208,10 @@ func (i Code) WrapWithContext(ctx context.Context, err error, args ...Code) *I18
 //   Pass easily obtain internationalized translations through Error, String, Translate
 //   WARNING
 type I18nCodeErrorWrap struct {
-	err    error  // wrap another error
-	origin Code   // custom shaping type Val
-	locale string // i18n locale set
-	args   []Code // formatted output replacement component
+	err    error         // wrap another error
+	origin Code          // custom shaping type Val
+	locale string        // i18n locale set
+	args   []interface{} // formatted output replacement component
 }
 
 // Translate get translated string
@@ -255,15 +255,15 @@ func (i Code) IsLocaleSupport(locale string) bool {
 
 // Lang get target translate text use context.Context
 //  - ctx  context with Value use Key from _Code_ctxKey, which pass by i18n-stringer flag -ctxkey
-//  - args Optional placeholder replacement value
-func (i Code) Lang(ctx context.Context, args ...Code) string {
+//  - args Optional placeholder replacement value, value type of Code, or type of string
+func (i Code) Lang(ctx context.Context, args ...interface{}) string {
 	return i._trans(_Code_localeFromCtxWithFallback(ctx), args...)
 }
 
 // Trans get target translate text use specified language locale identifier
 //  - locale specified language locale identifier, need pass by IsLocaleSupport
-//  - args Optional placeholder replacement value
-func (i Code) Trans(locale string, args ...Code) string {
+//  - args Optional placeholder replacement value, value type of Code, or type of string
+func (i Code) Trans(locale string, args ...interface{}) string {
 	if !_Code_isLocaleSupport(locale) {
 		locale = _Code_defaultLocale
 	}
@@ -292,12 +292,18 @@ func _Code_localeFromCtxWithFallback(ctx context.Context) string {
 }
 
 // _trans trustworthy parameters inside method
-func (i Code) _trans(locale string, args ...Code) string {
+//   - locale i18n local
+//   - args   value type of Code, or type of string
+func (i Code) _trans(locale string, args ...interface{}) string {
 	msg := i._transOne(locale)
 	if len(args) > 0 {
 		var com []interface{}
 		for _, arg := range args {
-			com = append(com, arg._transOne(locale))
+			if typ, ok := arg.(Code); ok {
+				com = append(com, typ._transOne(locale))
+			} else {
+				com = append(com, arg) // arg as string scalar
+			}
 		}
 		return fmt.Sprintf(msg, com...)
 	}
@@ -399,7 +405,7 @@ func (i Test) Code() int {
 //  - err another error
 //  - locale i18n locale name
 //  - args optional formatting component
-func (i Test) Wrap(err error, locale string, args ...Test) *I18nTestErrorWrap {
+func (i Test) Wrap(err error, locale string, args ...interface{}) *I18nTestErrorWrap {
 	return &I18nTestErrorWrap{err: err, origin: i, locale: locale, args: args}
 }
 
@@ -407,7 +413,7 @@ func (i Test) Wrap(err error, locale string, args ...Test) *I18nTestErrorWrap {
 //  - ctx context with Value use Key from _Test_ctxKey, which pass by i18n-stringer flag -ctxkey
 //  - err another error
 //  - args optional formatting component
-func (i Test) WrapWithContext(ctx context.Context, err error, args ...Test) *I18nTestErrorWrap {
+func (i Test) WrapWithContext(ctx context.Context, err error, args ...interface{}) *I18nTestErrorWrap {
 	return &I18nTestErrorWrap{err: err, origin: i, locale: _Test_localeFromCtxWithFallback(ctx), args: args}
 }
 
@@ -417,10 +423,10 @@ func (i Test) WrapWithContext(ctx context.Context, err error, args ...Test) *I18
 //   Pass easily obtain internationalized translations through Error, String, Translate
 //   WARNING
 type I18nTestErrorWrap struct {
-	err    error  // wrap another error
-	origin Test   // custom shaping type Val
-	locale string // i18n locale set
-	args   []Test // formatted output replacement component
+	err    error         // wrap another error
+	origin Test          // custom shaping type Val
+	locale string        // i18n locale set
+	args   []interface{} // formatted output replacement component
 }
 
 // Translate get translated string
@@ -464,15 +470,15 @@ func (i Test) IsLocaleSupport(locale string) bool {
 
 // Lang get target translate text use context.Context
 //  - ctx  context with Value use Key from _Test_ctxKey, which pass by i18n-stringer flag -ctxkey
-//  - args Optional placeholder replacement value
-func (i Test) Lang(ctx context.Context, args ...Test) string {
+//  - args Optional placeholder replacement value, value type of Test, or type of string
+func (i Test) Lang(ctx context.Context, args ...interface{}) string {
 	return i._trans(_Test_localeFromCtxWithFallback(ctx), args...)
 }
 
 // Trans get target translate text use specified language locale identifier
 //  - locale specified language locale identifier, need pass by IsLocaleSupport
-//  - args Optional placeholder replacement value
-func (i Test) Trans(locale string, args ...Test) string {
+//  - args Optional placeholder replacement value, value type of Test, or type of string
+func (i Test) Trans(locale string, args ...interface{}) string {
 	if !_Test_isLocaleSupport(locale) {
 		locale = _Test_defaultLocale
 	}
@@ -501,12 +507,18 @@ func _Test_localeFromCtxWithFallback(ctx context.Context) string {
 }
 
 // _trans trustworthy parameters inside method
-func (i Test) _trans(locale string, args ...Test) string {
+//   - locale i18n local
+//   - args   value type of Test, or type of string
+func (i Test) _trans(locale string, args ...interface{}) string {
 	msg := i._transOne(locale)
 	if len(args) > 0 {
 		var com []interface{}
 		for _, arg := range args {
-			com = append(com, arg._transOne(locale))
+			if typ, ok := arg.(Test); ok {
+				com = append(com, typ._transOne(locale))
+			} else {
+				com = append(com, arg) // arg as string scalar
+			}
 		}
 		return fmt.Sprintf(msg, com...)
 	}
@@ -609,7 +621,7 @@ func (i Single) Code() int {
 //  - err another error
 //  - locale i18n locale name
 //  - args optional formatting component
-func (i Single) Wrap(err error, locale string, args ...Single) *I18nSingleErrorWrap {
+func (i Single) Wrap(err error, locale string, args ...interface{}) *I18nSingleErrorWrap {
 	return &I18nSingleErrorWrap{err: err, origin: i, locale: locale, args: args}
 }
 
@@ -617,7 +629,7 @@ func (i Single) Wrap(err error, locale string, args ...Single) *I18nSingleErrorW
 //  - ctx context with Value use Key from _Single_ctxKey, which pass by i18n-stringer flag -ctxkey
 //  - err another error
 //  - args optional formatting component
-func (i Single) WrapWithContext(ctx context.Context, err error, args ...Single) *I18nSingleErrorWrap {
+func (i Single) WrapWithContext(ctx context.Context, err error, args ...interface{}) *I18nSingleErrorWrap {
 	return &I18nSingleErrorWrap{err: err, origin: i, locale: _Single_localeFromCtxWithFallback(ctx), args: args}
 }
 
@@ -627,10 +639,10 @@ func (i Single) WrapWithContext(ctx context.Context, err error, args ...Single) 
 //   Pass easily obtain internationalized translations through Error, String, Translate
 //   WARNING
 type I18nSingleErrorWrap struct {
-	err    error    // wrap another error
-	origin Single   // custom shaping type Val
-	locale string   // i18n locale set
-	args   []Single // formatted output replacement component
+	err    error         // wrap another error
+	origin Single        // custom shaping type Val
+	locale string        // i18n locale set
+	args   []interface{} // formatted output replacement component
 }
 
 // Translate get translated string
@@ -674,15 +686,15 @@ func (i Single) IsLocaleSupport(locale string) bool {
 
 // Lang get target translate text use context.Context
 //  - ctx  context with Value use Key from _Single_ctxKey, which pass by i18n-stringer flag -ctxkey
-//  - args Optional placeholder replacement value
-func (i Single) Lang(ctx context.Context, args ...Single) string {
+//  - args Optional placeholder replacement value, value type of Single, or type of string
+func (i Single) Lang(ctx context.Context, args ...interface{}) string {
 	return i._trans(_Single_localeFromCtxWithFallback(ctx), args...)
 }
 
 // Trans get target translate text use specified language locale identifier
 //  - locale specified language locale identifier, need pass by IsLocaleSupport
-//  - args Optional placeholder replacement value
-func (i Single) Trans(locale string, args ...Single) string {
+//  - args Optional placeholder replacement value, value type of Single, or type of string
+func (i Single) Trans(locale string, args ...interface{}) string {
 	if !_Single_isLocaleSupport(locale) {
 		locale = _Single_defaultLocale
 	}
@@ -711,12 +723,18 @@ func _Single_localeFromCtxWithFallback(ctx context.Context) string {
 }
 
 // _trans trustworthy parameters inside method
-func (i Single) _trans(locale string, args ...Single) string {
+//   - locale i18n local
+//   - args   value type of Single, or type of string
+func (i Single) _trans(locale string, args ...interface{}) string {
 	msg := i._transOne(locale)
 	if len(args) > 0 {
 		var com []interface{}
 		for _, arg := range args {
-			com = append(com, arg._transOne(locale))
+			if typ, ok := arg.(Single); ok {
+				com = append(com, typ._transOne(locale))
+			} else {
+				com = append(com, arg) // arg as string scalar
+			}
 		}
 		return fmt.Sprintf(msg, com...)
 	}

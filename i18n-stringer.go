@@ -1060,7 +1060,7 @@ func (i %[1]s) Code() %[6]s {
 //  - err another error
 //  - locale i18n locale name
 //  - args optional formatting component
-func (i %[1]s) Wrap(err error, locale string, args ...%[1]s) *I18n%[4]sErrorWrap {
+func (i %[1]s) Wrap(err error, locale string, args ...interface{}) *I18n%[4]sErrorWrap {
 	return &I18n%[4]sErrorWrap{err: err, origin: i, locale: locale, args: args}
 }
 
@@ -1068,7 +1068,7 @@ func (i %[1]s) Wrap(err error, locale string, args ...%[1]s) *I18n%[4]sErrorWrap
 //  - ctx context with Value use Key from _%[1]s_ctxKey, which pass by i18n-stringer flag -ctxkey
 //  - err another error
 //  - args optional formatting component
-func (i %[1]s) WrapWithContext(ctx context.Context, err error, args ...%[1]s) *I18n%[4]sErrorWrap {
+func (i %[1]s) WrapWithContext(ctx context.Context, err error, args ...interface{}) *I18n%[4]sErrorWrap {
 	return &I18n%[4]sErrorWrap{err: err, origin: i, locale: _%[1]s_localeFromCtxWithFallback(ctx), args: args}
 }
 
@@ -1078,10 +1078,10 @@ func (i %[1]s) WrapWithContext(ctx context.Context, err error, args ...%[1]s) *I
 //   Pass easily obtain internationalized translations through Error, String, Translate
 //   WARNING
 type I18n%[4]sErrorWrap struct {
-	err    error   // wrap another error
-	origin %[1]s   // custom shaping type Val
-	locale string  // i18n locale set
-	args   []%[1]s // formatted output replacement component
+	err    error         // wrap another error
+	origin %[1]s         // custom shaping type Val
+	locale string  	     // i18n locale set
+	args   []interface{} // formatted output replacement component
 }
 
 // Translate get translated string
@@ -1125,15 +1125,15 @@ func (i %[1]s) IsLocaleSupport(locale string) bool {
 
 // Lang get target translate text use context.Context
 //  - ctx  context with Value use Key from _%[1]s_ctxKey, which pass by i18n-stringer flag -ctxkey
-//  - args Optional placeholder replacement value
-func (i %[1]s) Lang(ctx context.Context, args ...%[1]s) string {
+//  - args Optional placeholder replacement value, value type of %[1]s, or type of string
+func (i %[1]s) Lang(ctx context.Context, args ...interface{}) string {
 	return i._trans(_%[1]s_localeFromCtxWithFallback(ctx), args...)
 }
 
 // Trans get target translate text use specified language locale identifier
 //  - locale specified language locale identifier, need pass by IsLocaleSupport
-//  - args Optional placeholder replacement value
-func (i %[1]s) Trans(locale string, args ...%[1]s) string {
+//  - args Optional placeholder replacement value, value type of %[1]s, or type of string
+func (i %[1]s) Trans(locale string, args ...interface{}) string {
 	if !_%[1]s_isLocaleSupport(locale) {
 		locale = _%[1]s_defaultLocale
 	}
@@ -1171,12 +1171,18 @@ func (g *Generator) buildI18nTransFunc(typeName string) {
 // Argument to format is the type name.
 // 1% typeName
 const i18nTransFun = `// _trans trustworthy parameters inside method
-func (i %[1]s) _trans(locale string, args ...%[1]s) string {
+//   - locale i18n local
+//   - args   value type of %[1]s, or type of string
+func (i %[1]s) _trans(locale string, args ...interface{}) string {
 	msg := i._transOne(locale)
 	if len(args) > 0 {
 		var com []interface{}
 		for _, arg := range args {
-			com = append(com, arg._transOne(locale))
+			if typ, ok := arg.(%[1]s); ok {
+				com = append(com, typ._transOne(locale))
+			} else {
+				com = append(com, arg) // arg as string scalar
+			}
 		}
 		return fmt.Sprintf(msg, com...)
 	}

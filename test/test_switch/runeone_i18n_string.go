@@ -83,7 +83,7 @@ func (i RuneOne) Code() int {
 //  - err another error
 //  - locale i18n locale name
 //  - args optional formatting component
-func (i RuneOne) Wrap(err error, locale string, args ...RuneOne) *I18nRuneOneErrorWrap {
+func (i RuneOne) Wrap(err error, locale string, args ...interface{}) *I18nRuneOneErrorWrap {
 	return &I18nRuneOneErrorWrap{err: err, origin: i, locale: locale, args: args}
 }
 
@@ -91,7 +91,7 @@ func (i RuneOne) Wrap(err error, locale string, args ...RuneOne) *I18nRuneOneErr
 //  - ctx context with Value use Key from _RuneOne_ctxKey, which pass by i18n-stringer flag -ctxkey
 //  - err another error
 //  - args optional formatting component
-func (i RuneOne) WrapWithContext(ctx context.Context, err error, args ...RuneOne) *I18nRuneOneErrorWrap {
+func (i RuneOne) WrapWithContext(ctx context.Context, err error, args ...interface{}) *I18nRuneOneErrorWrap {
 	return &I18nRuneOneErrorWrap{err: err, origin: i, locale: _RuneOne_localeFromCtxWithFallback(ctx), args: args}
 }
 
@@ -101,10 +101,10 @@ func (i RuneOne) WrapWithContext(ctx context.Context, err error, args ...RuneOne
 //   Pass easily obtain internationalized translations through Error, String, Translate
 //   WARNING
 type I18nRuneOneErrorWrap struct {
-	err    error     // wrap another error
-	origin RuneOne   // custom shaping type Val
-	locale string    // i18n locale set
-	args   []RuneOne // formatted output replacement component
+	err    error         // wrap another error
+	origin RuneOne       // custom shaping type Val
+	locale string        // i18n locale set
+	args   []interface{} // formatted output replacement component
 }
 
 // Translate get translated string
@@ -148,15 +148,15 @@ func (i RuneOne) IsLocaleSupport(locale string) bool {
 
 // Lang get target translate text use context.Context
 //  - ctx  context with Value use Key from _RuneOne_ctxKey, which pass by i18n-stringer flag -ctxkey
-//  - args Optional placeholder replacement value
-func (i RuneOne) Lang(ctx context.Context, args ...RuneOne) string {
+//  - args Optional placeholder replacement value, value type of RuneOne, or type of string
+func (i RuneOne) Lang(ctx context.Context, args ...interface{}) string {
 	return i._trans(_RuneOne_localeFromCtxWithFallback(ctx), args...)
 }
 
 // Trans get target translate text use specified language locale identifier
 //  - locale specified language locale identifier, need pass by IsLocaleSupport
-//  - args Optional placeholder replacement value
-func (i RuneOne) Trans(locale string, args ...RuneOne) string {
+//  - args Optional placeholder replacement value, value type of RuneOne, or type of string
+func (i RuneOne) Trans(locale string, args ...interface{}) string {
 	if !_RuneOne_isLocaleSupport(locale) {
 		locale = _RuneOne_defaultLocale
 	}
@@ -185,12 +185,18 @@ func _RuneOne_localeFromCtxWithFallback(ctx context.Context) string {
 }
 
 // _trans trustworthy parameters inside method
-func (i RuneOne) _trans(locale string, args ...RuneOne) string {
+//   - locale i18n local
+//   - args   value type of RuneOne, or type of string
+func (i RuneOne) _trans(locale string, args ...interface{}) string {
 	msg := i._transOne(locale)
 	if len(args) > 0 {
 		var com []interface{}
 		for _, arg := range args {
-			com = append(com, arg._transOne(locale))
+			if typ, ok := arg.(RuneOne); ok {
+				com = append(com, typ._transOne(locale))
+			} else {
+				com = append(com, arg) // arg as string scalar
+			}
 		}
 		return fmt.Sprintf(msg, com...)
 	}
@@ -291,7 +297,7 @@ func (i RuneMulti) Code() int {
 //  - err another error
 //  - locale i18n locale name
 //  - args optional formatting component
-func (i RuneMulti) Wrap(err error, locale string, args ...RuneMulti) *I18nRuneMultiErrorWrap {
+func (i RuneMulti) Wrap(err error, locale string, args ...interface{}) *I18nRuneMultiErrorWrap {
 	return &I18nRuneMultiErrorWrap{err: err, origin: i, locale: locale, args: args}
 }
 
@@ -299,7 +305,7 @@ func (i RuneMulti) Wrap(err error, locale string, args ...RuneMulti) *I18nRuneMu
 //  - ctx context with Value use Key from _RuneMulti_ctxKey, which pass by i18n-stringer flag -ctxkey
 //  - err another error
 //  - args optional formatting component
-func (i RuneMulti) WrapWithContext(ctx context.Context, err error, args ...RuneMulti) *I18nRuneMultiErrorWrap {
+func (i RuneMulti) WrapWithContext(ctx context.Context, err error, args ...interface{}) *I18nRuneMultiErrorWrap {
 	return &I18nRuneMultiErrorWrap{err: err, origin: i, locale: _RuneMulti_localeFromCtxWithFallback(ctx), args: args}
 }
 
@@ -309,10 +315,10 @@ func (i RuneMulti) WrapWithContext(ctx context.Context, err error, args ...RuneM
 //   Pass easily obtain internationalized translations through Error, String, Translate
 //   WARNING
 type I18nRuneMultiErrorWrap struct {
-	err    error       // wrap another error
-	origin RuneMulti   // custom shaping type Val
-	locale string      // i18n locale set
-	args   []RuneMulti // formatted output replacement component
+	err    error         // wrap another error
+	origin RuneMulti     // custom shaping type Val
+	locale string        // i18n locale set
+	args   []interface{} // formatted output replacement component
 }
 
 // Translate get translated string
@@ -356,15 +362,15 @@ func (i RuneMulti) IsLocaleSupport(locale string) bool {
 
 // Lang get target translate text use context.Context
 //  - ctx  context with Value use Key from _RuneMulti_ctxKey, which pass by i18n-stringer flag -ctxkey
-//  - args Optional placeholder replacement value
-func (i RuneMulti) Lang(ctx context.Context, args ...RuneMulti) string {
+//  - args Optional placeholder replacement value, value type of RuneMulti, or type of string
+func (i RuneMulti) Lang(ctx context.Context, args ...interface{}) string {
 	return i._trans(_RuneMulti_localeFromCtxWithFallback(ctx), args...)
 }
 
 // Trans get target translate text use specified language locale identifier
 //  - locale specified language locale identifier, need pass by IsLocaleSupport
-//  - args Optional placeholder replacement value
-func (i RuneMulti) Trans(locale string, args ...RuneMulti) string {
+//  - args Optional placeholder replacement value, value type of RuneMulti, or type of string
+func (i RuneMulti) Trans(locale string, args ...interface{}) string {
 	if !_RuneMulti_isLocaleSupport(locale) {
 		locale = _RuneMulti_defaultLocale
 	}
@@ -393,12 +399,18 @@ func _RuneMulti_localeFromCtxWithFallback(ctx context.Context) string {
 }
 
 // _trans trustworthy parameters inside method
-func (i RuneMulti) _trans(locale string, args ...RuneMulti) string {
+//   - locale i18n local
+//   - args   value type of RuneMulti, or type of string
+func (i RuneMulti) _trans(locale string, args ...interface{}) string {
 	msg := i._transOne(locale)
 	if len(args) > 0 {
 		var com []interface{}
 		for _, arg := range args {
-			com = append(com, arg._transOne(locale))
+			if typ, ok := arg.(RuneMulti); ok {
+				com = append(com, typ._transOne(locale))
+			} else {
+				com = append(com, arg) // arg as string scalar
+			}
 		}
 		return fmt.Sprintf(msg, com...)
 	}
@@ -513,7 +525,7 @@ func (i RuneMap) Code() int {
 //  - err another error
 //  - locale i18n locale name
 //  - args optional formatting component
-func (i RuneMap) Wrap(err error, locale string, args ...RuneMap) *I18nRuneMapErrorWrap {
+func (i RuneMap) Wrap(err error, locale string, args ...interface{}) *I18nRuneMapErrorWrap {
 	return &I18nRuneMapErrorWrap{err: err, origin: i, locale: locale, args: args}
 }
 
@@ -521,7 +533,7 @@ func (i RuneMap) Wrap(err error, locale string, args ...RuneMap) *I18nRuneMapErr
 //  - ctx context with Value use Key from _RuneMap_ctxKey, which pass by i18n-stringer flag -ctxkey
 //  - err another error
 //  - args optional formatting component
-func (i RuneMap) WrapWithContext(ctx context.Context, err error, args ...RuneMap) *I18nRuneMapErrorWrap {
+func (i RuneMap) WrapWithContext(ctx context.Context, err error, args ...interface{}) *I18nRuneMapErrorWrap {
 	return &I18nRuneMapErrorWrap{err: err, origin: i, locale: _RuneMap_localeFromCtxWithFallback(ctx), args: args}
 }
 
@@ -531,10 +543,10 @@ func (i RuneMap) WrapWithContext(ctx context.Context, err error, args ...RuneMap
 //   Pass easily obtain internationalized translations through Error, String, Translate
 //   WARNING
 type I18nRuneMapErrorWrap struct {
-	err    error     // wrap another error
-	origin RuneMap   // custom shaping type Val
-	locale string    // i18n locale set
-	args   []RuneMap // formatted output replacement component
+	err    error         // wrap another error
+	origin RuneMap       // custom shaping type Val
+	locale string        // i18n locale set
+	args   []interface{} // formatted output replacement component
 }
 
 // Translate get translated string
@@ -578,15 +590,15 @@ func (i RuneMap) IsLocaleSupport(locale string) bool {
 
 // Lang get target translate text use context.Context
 //  - ctx  context with Value use Key from _RuneMap_ctxKey, which pass by i18n-stringer flag -ctxkey
-//  - args Optional placeholder replacement value
-func (i RuneMap) Lang(ctx context.Context, args ...RuneMap) string {
+//  - args Optional placeholder replacement value, value type of RuneMap, or type of string
+func (i RuneMap) Lang(ctx context.Context, args ...interface{}) string {
 	return i._trans(_RuneMap_localeFromCtxWithFallback(ctx), args...)
 }
 
 // Trans get target translate text use specified language locale identifier
 //  - locale specified language locale identifier, need pass by IsLocaleSupport
-//  - args Optional placeholder replacement value
-func (i RuneMap) Trans(locale string, args ...RuneMap) string {
+//  - args Optional placeholder replacement value, value type of RuneMap, or type of string
+func (i RuneMap) Trans(locale string, args ...interface{}) string {
 	if !_RuneMap_isLocaleSupport(locale) {
 		locale = _RuneMap_defaultLocale
 	}
@@ -615,12 +627,18 @@ func _RuneMap_localeFromCtxWithFallback(ctx context.Context) string {
 }
 
 // _trans trustworthy parameters inside method
-func (i RuneMap) _trans(locale string, args ...RuneMap) string {
+//   - locale i18n local
+//   - args   value type of RuneMap, or type of string
+func (i RuneMap) _trans(locale string, args ...interface{}) string {
 	msg := i._transOne(locale)
 	if len(args) > 0 {
 		var com []interface{}
 		for _, arg := range args {
-			com = append(com, arg._transOne(locale))
+			if typ, ok := arg.(RuneMap); ok {
+				com = append(com, typ._transOne(locale))
+			} else {
+				com = append(com, arg) // arg as string scalar
+			}
 		}
 		return fmt.Sprintf(msg, com...)
 	}
