@@ -267,18 +267,23 @@ func (e *I18nCodeErrorWrap) String() string {
 	return e.Translate()
 }
 
-// Error struct as error, get translated string use Translate
+// Error struct as error, get typed message wrap with inside error message
+//  - this method will be formatted wrap error if exist.
+//  - Only for development and debugging, or logging full error message
+//  - if you want to get typed message, please use method String or Translate
 func (e *I18nCodeErrorWrap) Error() string {
-	return e.Translate()
+	if e.err == nil {
+		return e.Translate()
+	}
+	return fmt.Sprintf("%s (%s)", e.Translate(), e.err.Error())
 }
 
-// Format string form inside error and TOML define
-//  - this method will be formatted wrap error. Only for development and debugging
+// Format alias for method Error
+//  - this method will be formatted wrap error if exist.
+//  - Only for development and debugging, or logging full error message
+//  - if you want to get typed message, please use method String or Translate
 func (e *I18nCodeErrorWrap) Format() string {
-	if e.err == nil {
-		return e.Error()
-	}
-	return fmt.Sprintf("%s (%s)", e.Error(), e.err.Error())
+	return e.Error()
 }
 
 // Value get original type value
@@ -497,18 +502,23 @@ func (e *I18nTestErrorWrap) String() string {
 	return e.Translate()
 }
 
-// Error struct as error, get translated string use Translate
+// Error struct as error, get typed message wrap with inside error message
+//  - this method will be formatted wrap error if exist.
+//  - Only for development and debugging, or logging full error message
+//  - if you want to get typed message, please use method String or Translate
 func (e *I18nTestErrorWrap) Error() string {
-	return e.Translate()
+	if e.err == nil {
+		return e.Translate()
+	}
+	return fmt.Sprintf("%s (%s)", e.Translate(), e.err.Error())
 }
 
-// Format string form inside error and TOML define
-//  - this method will be formatted wrap error. Only for development and debugging
+// Format alias for method Error
+//  - this method will be formatted wrap error if exist.
+//  - Only for development and debugging, or logging full error message
+//  - if you want to get typed message, please use method String or Translate
 func (e *I18nTestErrorWrap) Format() string {
-	if e.err == nil {
-		return e.Error()
-	}
-	return fmt.Sprintf("%s (%s)", e.Error(), e.err.Error())
+	return e.Error()
 }
 
 // Value get original type value
@@ -717,18 +727,23 @@ func (e *I18nSingleErrorWrap) String() string {
 	return e.Translate()
 }
 
-// Error struct as error, get translated string use Translate
+// Error struct as error, get typed message wrap with inside error message
+//  - this method will be formatted wrap error if exist.
+//  - Only for development and debugging, or logging full error message
+//  - if you want to get typed message, please use method String or Translate
 func (e *I18nSingleErrorWrap) Error() string {
-	return e.Translate()
+	if e.err == nil {
+		return e.Translate()
+	}
+	return fmt.Sprintf("%s (%s)", e.Translate(), e.err.Error())
 }
 
-// Format string form inside error and TOML define
-//  - this method will be formatted wrap error. Only for development and debugging
+// Format alias for method Error
+//  - this method will be formatted wrap error if exist.
+//  - Only for development and debugging, or logging full error message
+//  - if you want to get typed message, please use method String or Translate
 func (e *I18nSingleErrorWrap) Format() string {
-	if e.err == nil {
-		return e.Error()
-	}
-	return fmt.Sprintf("%s (%s)", e.Error(), e.err.Error())
+	return e.Error()
 }
 
 // Value get original type value
