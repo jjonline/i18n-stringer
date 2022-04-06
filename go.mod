@@ -1,4 +1,4 @@
-module github.com/tvb-sz/i18n-stringer
+module github.com/jjonline/i18n-stringer
 
 go 1.17
 

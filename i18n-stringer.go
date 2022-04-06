@@ -5,7 +5,7 @@
 // The above is the copyright information reserved by reference stringer
 // REF: https://github.com/golang/tools/tree/master/cmd/stringer
 //
-// Copyright 2021 The team tvb-sz Authors. All rights reserved.
+// Copyright 2021 The team jjonline Authors. All rights reserved.
 // Use of this source code is governed by a MIT License
 // license that can be found in the LICENSE file.
 //
@@ -156,7 +156,7 @@ func Usage() {
 	_, _ = fmt.Fprintf(os.Stderr, "\ti18n-stringer [flags] -type T -tomlpath DIR -check # just for check\n")
 	_, _ = fmt.Fprintf(os.Stderr, "\ti18n-stringer [flags] -type T -defaultlocale LOCALE -tomlpath DIR files... # Must be a single package\n")
 	_, _ = fmt.Fprintf(os.Stderr, "For more information, see:\n")
-	_, _ = fmt.Fprintf(os.Stderr, "\thttps://github.com/tvb-sz/i18n-stringer\n")
+	_, _ = fmt.Fprintf(os.Stderr, "\thttps://github.com/jjonline/i18n-stringer\n")
 	_, _ = fmt.Fprintf(os.Stderr, "Flags:\n")
 	flag.PrintDefaults()
 }

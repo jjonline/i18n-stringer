@@ -1,3 +1,3 @@
-module github.com/tvb-sz/i18n-stringer/example
+module github.com/jjonline/i18n-stringer/example
 
 go 1.17

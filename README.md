@@ -16,12 +16,12 @@ because of the use of `context.Context` the generated code can be used for versi
 
 go Version 1.16 and above for install/使用go1.16及其以上版本编译安装
 ````
-go install github.com/tvb-sz/i18n-stringer@latest
+go install github.com/jjonline/i18n-stringer@latest
 ````
 
 或者也可以直接從release下載對應平台編譯好的二進制
 可執行程序放置於環境變量目錄下
-即可使用：[https://github.com/tvb-sz/i18n-stringer/releases](https://github.com/tvb-sz/i18n-stringer/releases)
+即可使用：[https://github.com/jjonline/i18n-stringer/releases](https://github.com/jjonline/i18n-stringer/releases)
 
 ---
 
@@ -137,7 +137,7 @@ Usage of i18n-stringer:
         i18n-stringer [flags] -type T -tomlpath DIR -check # just for check
         i18n-stringer [flags] -type T -defaultlocale LOCALE -tomlpath DIR files... # Must be a single package
 For more information, see:
-        https://github.com/tvb-sz/i18n-stringer
+        https://github.com/jjonline/i18n-stringer
 Flags:
   -check
         Check missing or useless key-value pairs in TOML

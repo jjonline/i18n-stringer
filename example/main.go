@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/tvb-sz/i18n-stringer/example/lang"
+	"github.com/jjonline/i18n-stringer/example/lang"
 )
 
 func main() {
