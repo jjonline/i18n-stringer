@@ -17,9 +17,21 @@
 //	func (t T) Wrap(err error, locale string, args ...T) I18nTErrorWrap
 //	func (t T) WrapWithContext(ctx context.Context, err error, args ...T) I18nTErrorWrap
 //	func (t T) IsLocaleSupport(locale string) bool
-//	func (t T) Lang(ctx context.Context, args ...RuneOne) string
-//	func (t T) Trans(locale string, args ...RuneOne) string
-//	--- Note that I18nTErrorWrap struct is an error wrap type ---
+//	func (t T) Lang(ctx context.Context, args ...interface{}) string
+//	func (t T) Trans(locale string, args ...interface{}) string
+//	--- Noted ---
+//	1. I18nTErrorWrap struct is an error wrap type
+//	2. All type interface{} for named param ...args interface{}, can only use variable typed T or string
+//
+// wrapped type I18nTErrorWrap implement method list
+//	func (t I18nTErrorWrap) Translate() string
+//	func (t I18nTErrorWrap) String() string
+//	func (t I18nTErrorWrap) Error() string
+//	func (t I18nTErrorWrap) Format() string
+//	func (t I18nTErrorWrap) Value() Code
+//	func (t I18nTErrorWrap) Unwrap() error
+//	--- you can see generated file get more detail ---
+//
 // The file is created in the same package and directory as the package that defines T.
 // It has helpful defaults designed for use with go generate.
 //
