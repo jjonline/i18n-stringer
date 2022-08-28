@@ -14,8 +14,8 @@
 // defined, i18n-stringer will create a new self-contained Go source file implementing
 //	func (t T) String() string
 //	func (t T) Error() string
-//	func (t T) Wrap(err error, locale string, args ...interface{}) I18nTErrorWrap
-//	func (t T) WrapWithContext(ctx context.Context, err error, args ...interface{}) I18nTErrorWrap
+//	func (t T) Wrap(err error, locale string, args ...interface{}) *I18nTErrorWrap
+//	func (t T) WrapWithContext(ctx context.Context, err error, args ...interface{}) *I18nTErrorWrap
 //	func (t T) IsLocaleSupport(locale string) bool
 //	func (t T) Lang(ctx context.Context, args ...interface{}) string
 //	func (t T) Trans(locale string, args ...interface{}) string
@@ -24,14 +24,15 @@
 //	2. All type interface{} for named param ...args interface{}, can only use variable typed T or string
 //
 // wrapped type I18nTErrorWrap implement method list
-//	func (t I18nTErrorWrap) Translate() string
-//	func (t I18nTErrorWrap) String() string
-//	func (t I18nTErrorWrap) Error() string
-//	func (t I18nTErrorWrap) Format() string
-//	func (t I18nTErrorWrap) Value() Code
-//	func (t I18nTErrorWrap) Unwrap() error
+//	func (t *I18nTErrorWrap) Translate() string
+//	func (t *I18nTErrorWrap) String() string
+//	func (t *I18nTErrorWrap) Error() string
+//	func (t *I18nTErrorWrap) Format() string
+//	func (t *I18nTErrorWrap) Value() Code
+//	func (t *I18nTErrorWrap) Unwrap() error
 //	--- you can see generated file get more detail ---
 //
+// As you can see type I18nTErrorWrap also is an typed Error, and can wrap/unwrap your business logic error
 // The file is created in the same package and directory as the package that defines T.
 // It has helpful defaults designed for use with go generate.
 //
@@ -91,11 +92,25 @@
 //
 //	func (Pill) String() string
 //	func (Pill) Error() string
-//	func (Pill) Wrap(err error, locale string, args ...interface{}) I18nPillErrorWrap
-//	func (Pill) WrapWithContext(ctx context.Context, err error, args ...interface{}) I18nPillErrorWrap
+//	func (Pill) Wrap(err error, locale string, args ...interface{}) *I18nPillErrorWrap
+//	func (Pill) WrapWithContext(ctx context.Context, err error, args ...interface{}) *I18nPillErrorWrap
 //	func (Pill) IsLocaleSupport(locale string) bool
 //	func (Pill) Lang(ctx context.Context, args ...interface{}) string
 //	func (Pill) Trans(locale string, args ...interface{}) string
+//	// also wrap/unwrap type I18nPillErrorWrap generated
+//	type I18nPillErrorWrap struct {
+//		err    error         // wrap another error
+//		origin Pill          // custom shaping type Val
+//		locale string        // i18n locale set
+//		args   []interface{} // formatted output replacement component
+//	}
+//	// you can see your generate file get more detail for this method
+//	func (t *I18nPillErrorWrap) Translate() string
+//	func (t *I18nPillErrorWrap) String() string
+//	func (t *I18nPillErrorWrap) Error() string
+//	func (t *I18nPillErrorWrap) Format() string
+//	func (t *I18nPillErrorWrap) Value() Code
+//	func (t *I18nPillErrorWrap) Unwrap() error
 //
 // That methods will translate the value of a Pill constant to the string representation
 // of the respective value define in TOML file
