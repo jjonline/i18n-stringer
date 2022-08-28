@@ -14,8 +14,8 @@
 // defined, i18n-stringer will create a new self-contained Go source file implementing
 //	func (t T) String() string
 //	func (t T) Error() string
-//	func (t T) Wrap(err error, locale string, args ...T) I18nTErrorWrap
-//	func (t T) WrapWithContext(ctx context.Context, err error, args ...T) I18nTErrorWrap
+//	func (t T) Wrap(err error, locale string, args ...interface{}) I18nTErrorWrap
+//	func (t T) WrapWithContext(ctx context.Context, err error, args ...interface{}) I18nTErrorWrap
 //	func (t T) IsLocaleSupport(locale string) bool
 //	func (t T) Lang(ctx context.Context, args ...interface{}) string
 //	func (t T) Trans(locale string, args ...interface{}) string
